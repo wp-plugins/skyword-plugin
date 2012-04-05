@@ -1,0 +1,26 @@
+=== Skyword API Plugin ===
+Contributors: skyword
+Tags: skyword, api
+Requires at least: 3.0.2
+Tested up to: 3.3
+Stable tag: 1.03
+
+Allows integration with the skyword publishing platform.
+
+== Description ==
+
+Allows integration with the skyword publishing platform.
+
+== Installation ==
+
+
+== Frequently Asked Questions ==
+
+== Screenshots ==
+
+== Changelog ==
+
+= 1.03 =
+* Initial release through wordpress SVN
+
+
