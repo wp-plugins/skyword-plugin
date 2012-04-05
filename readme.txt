@@ -3,7 +3,7 @@ Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.0.2
 Tested up to: 3.3
-Stable tag: 1.03
+Stable tag: 1.0.4
 
 Allows integration with the skyword publishing platform.
 
@@ -19,8 +19,10 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 1.0.4 =
+* Added update functionality
 
-= 1.03 =
+= 1.0.3 =
 * Initial release through wordpress SVN
 
 
