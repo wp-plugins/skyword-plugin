@@ -19,6 +19,9 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 1.0.6 =
+* Fixed featured image updating
+
 = 1.0.5 =
 * Fixed author syncing bug
 
