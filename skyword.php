@@ -3,7 +3,7 @@
 Plugin Name: Skyword
 Plugin URI: http://www.skyword.com
 Description: Integration with the Skyword content publication platform.
-Version: 1.0.6
+Version: 1.0.6.1
 Author: Skyword, Inc.
 Author URI: http://www.skyword.com
 License: GPL2
@@ -12,7 +12,7 @@ License: GPL2
 /*  Copyright 2012  Skyword, Inc.     This program is free software; you can redistribute it and/or modify    it under the terms of the GNU General Public License, version 2, as    published by the Free Software Foundation.     This program is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.     You should have received a copy of the GNU General Public License    along with this program; if not, write to the Free Software    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA */ 
 
 //Admin option page. Currently just a placeholder if necessary
-$versionNumber = "1.0.6";
+$versionNumber = "1.0.6.1";
 
 function skyword_admin(){
 	if (!current_user_can('manage_options'))  {
@@ -31,9 +31,9 @@ function skyword_admin_actions() {
 // Plugin with update info
 $packages['skyword'] = array(
 	'versions' => array(
-		'1.0.6' => array(
-			'version' => "1.0.6",
-			'date' => '2012-5-30',
+		'1.0.6.1' => array(
+			'version' => "1.0.6.1",
+			'date' => '2012-6-12',
 			'author' => 'Stephen da Conceicao',
 			'requires' => '3.0',  // WP version required for plugin
 			'tested' => '3.0.1',  // WP version tested with
@@ -76,7 +76,7 @@ function skyword_version($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.6");
+	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.6.1");
 }
 function skyword_author($args){
 	$username	= $args[1];
@@ -310,14 +310,16 @@ function attach_attachments($post_id, $data){
 	$attachments = $wpdb->get_results( "SELECT ID, guid FROM {$wpdb->posts} WHERE post_parent = '0' AND post_type = 'attachment'" );
 	if ( is_array( $attachments ) ) {
 		foreach ( $attachments as $file ) {
-			foreach ($data['attachments'] as $attachmentExt){
-				if ( $attachmentExt == $file->guid){
-					$wpdb->update($wpdb->posts, array('post_parent' => $post_id), array('ID' => $file->ID) );
-				}
-				if ( strpos( $attachmentExt, $file->guid."featured" ) !== false ){
-					delete_post_meta($post_id, '_thumbnail_id');
-					add_post_meta($post_id, '_thumbnail_id', $file->ID, false);
-					
+			if (is_array($data['attachments'])){
+				foreach ($data['attachments'] as $attachmentExt){
+					if ( $attachmentExt == $file->guid){
+						$wpdb->update($wpdb->posts, array('post_parent' => $post_id), array('ID' => $file->ID) );
+					}
+					if ( strpos( $attachmentExt, $file->guid."featured" ) !== false ){
+						delete_post_meta($post_id, '_thumbnail_id');
+						add_post_meta($post_id, '_thumbnail_id', $file->ID, false);
+						
+					}
 				}
 			}
 		}
