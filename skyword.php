@@ -2,8 +2,8 @@
 /*
 Plugin Name: Skyword
 Plugin URI: http://www.skyword.com
-Description: Integration with the Skyword content publication platform.
-Version: 1.0.6.1
+Descriptionews: Integration with the Skyword content publication platform.
+Versionews: 1.0.7
 Author: Skyword, Inc.
 Author URI: http://www.skyword.com
 License: GPL2
@@ -12,7 +12,7 @@ License: GPL2
 /*  Copyright 2012  Skyword, Inc.     This program is free software; you can redistribute it and/or modify    it under the terms of the GNU General Public License, version 2, as    published by the Free Software Foundation.     This program is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.     You should have received a copy of the GNU General Public License    along with this program; if not, write to the Free Software    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA */ 
 
 //Admin option page. Currently just a placeholder if necessary
-$versionNumber = "1.0.6.1";
+$versionNumber = "1.0.7";
 
 function skyword_admin(){
 	if (!current_user_can('manage_options'))  {
@@ -31,9 +31,9 @@ function skyword_admin_actions() {
 // Plugin with update info
 $packages['skyword'] = array(
 	'versions' => array(
-		'1.0.6.1' => array(
-			'version' => "1.0.6.1",
-			'date' => '2012-6-12',
+		'1.0.6' => array(
+			'version' => "1.0.7",
+			'date' => '2012-5-30',
 			'author' => 'Stephen da Conceicao',
 			'requires' => '3.0',  // WP version required for plugin
 			'tested' => '3.0.1',  // WP version tested with
@@ -56,7 +56,19 @@ $packages['skyword'] = array(
 
 
 //Creates xmlrpc method listener
+register_activation_hook(__FILE__, 'activate_rebuild_sitemap');
 add_filter('xmlrpc_methods', 'skyword_xmlrpc_methods');
+add_action('publish_post', 'write_sitemaps');
+add_action('save_post', 'write_sitemaps');
+add_action('delete_post', 'write_sitemaps');
+add_action('transition_post_status', 'write_sitemaps',10, 3); 
+add_action('rebuild_sitemap', 'write_sitemaps');
+add_action('update_option_googlenewssitemap_excludeCat', 'write_sitemaps', 10, 2);
+
+function activate_rebuild_sitemap() {
+	wp_schedule_event( current_time( 'timestamp' ), 'hourly', 'rebuild_sitemap');
+}
+
 function skyword_xmlrpc_methods($methods){
 	$methods['skyword_post'] = 'skyword_post';
 	$methods['skyword_newMediaObject'] = 'skyword_newMediaObject';
@@ -71,12 +83,12 @@ function skyword_version($args){
 	global $wp_xmlrpc_server;
 	//Authenticate that posting user is valid
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-		return strval('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password);
+		return strval('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password);
 	}
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.6.1");
+	return strval("Wordpress Versionews: ".get_bloginfo('version')." Plugin Versionews: 1.0.7");
 }
 function skyword_author($args){
 	$username	= $args[1];
@@ -85,7 +97,7 @@ function skyword_author($args){
 	global $wp_xmlrpc_server;
 	//Authenticate that posting user is valid
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-		return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
+		return new IXR_Error(403, __('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password));
 	}
 	if (!user_can($user->ID, 'edit_posts')){
 		return new IXR_Error(403, __('You do not have sufficient privileges to login.'));
@@ -101,7 +113,7 @@ function skyword_getAuthors($args){
 	$password	= $args[2];
 	global $wp_xmlrpc_server;
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-		return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
+		return new IXR_Error(403, __('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password));
 	}
 
 	if (!user_can($user->ID, 'edit_posts')){
@@ -130,7 +142,7 @@ function skyword_post($args){
 	
 	//Authenticate that posting user is valid
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-		return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
+		return new IXR_Error(403, __('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password));
 	}
 	
 	if (!user_can($user->ID, 'edit_posts')){
@@ -148,6 +160,7 @@ function skyword_post($args){
 	} else {
 		$state = "draft";
 	}
+	
 	//get category ids from category names
 	$categories = explode(",",$data['categories']);
 	$post_category = array();
@@ -161,7 +174,8 @@ function skyword_post($args){
 				$post_category[] = get_cat_ID($categoryName);
 			}
 	}
-	
+	//check if content exists already
+	$data['post-id'] = check_content_exists($data['skyword-id']);
 	if (null != $data['post-id']){
 		//update existing post
 		$new_post = array(
@@ -194,10 +208,39 @@ function skyword_post($args){
 	attach_attachments($post_id, $data);
 	//add content template/attachment information as meta 
 	create_custom_fields($post_id, $data);
+	//Create sitemap information
+	if ('news' == $data['publication-type']){
+		delete_post_meta($post_id,'publication-type');
+		add_post_meta($post_id, 'publication-type','news', false);
+		if (null != $data['publication-access']){
+			delete_post_meta($post_id,'publication-access');
+			add_post_meta($post_id, 'publication-access',$data['publication-access'], false);
+		}
+		if (null != $data['publication-name']){
+			delete_post_meta($post_id,'publication-name');
+			add_post_meta($post_id, 'publication-name',$data['publication-name'], false);
+		}
+		if (null != $data['publication-geolocation']){
+			delete_post_meta($post_id,'publication-geolocation');
+			add_post_meta($post_id, 'publication-geolocation',$data['publication-geolocation'], false);
+		}
+		if (null != $data['publication-keywords']){
+			delete_post_meta($post_id,'publication-keywords');
+			add_post_meta($post_id, 'publication-keywords',$data['publication-keywords'], false);
+		}
+		if (null != $data['publication-stocktickers']){
+			delete_post_meta($post_id,'publication-stocktickers');
+			add_post_meta($post_id, 'publication-stocktickers',$data['publication-stocktickers'], false);
+		}
+		write_google_news_sitemap();
+	} else {
+		delete_post_meta($post_id,'publication-type');
+		add_post_meta($post_id, 'publication-type','evergreen', false);
+	}
+	
 	return strval($post_id);
 
 }
-
 
 function skyword_newMediaObject($args) {
 		global $wpdb;
@@ -217,7 +260,7 @@ function skyword_newMediaObject($args) {
 
 		logIO('O', '(MW) Received '.strlen($bits).' bytes');
 		if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-			return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
+			return new IXR_Error(403, __('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password));
 		}
 		do_action('xmlrpc_call', 'metaWeblog.newMediaObject');
 
@@ -275,7 +318,17 @@ function skyword_newMediaObject($args) {
 		return apply_filters( 'wp_handle_upload', array( 'file' => $name, 'url' => $upload[ 'url' ], 'type' => $type ), 'upload' );
 	}
 
-
+function check_content_exists($skywordId){
+	query_posts('meta_key=skywordid&meta_value='.$skywordId);
+	if (have_posts()) :
+		while (have_posts()) : the_post();
+			$str = get_the_ID() ;
+			return $str;
+		endwhile;
+	else :
+		return null;
+	endif;
+}
 
 function check_category_exists($category_name){
 	$cat_values = array('cat_name' => trim($category_name) );
@@ -333,6 +386,141 @@ function create_custom_fields($post_id, $data){
 		add_post_meta($post_id, $fields[0],$fields[1], false);
 	}
 }
+function write_sitemaps(){
+	write_google_news_sitemap();
+ 	write_evergreen_sitemap();
+}
+function write_google_news_sitemap(){
 
+	global $wpdb;
+	// Fetch options from database
+	$permalink_structure = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name='permalink_structure'");
+	$siteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options	WHERE option_name='siteurl'");
+	// Begin urlset
+	$xmlOutput.= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:news=\"http://www.google.com/schemas/sitemap-news/0.9\">\n";
 
+	$includeMe = 'AND post_type="post"';
+	//Exclude categories
+	if (get_option('googlenewssitemap_excludeCat')<>NULL)	{
+		$exPosts = get_objects_in_term(get_option('googlenewssitemap_excludeCat'),"category");
+		$includeMe.= ' AND ID NOT IN ('.implode(",",$exPosts).')';
+	}
+
+	//Limit to last 2 days, 1000 items as google requires
+	$rows = $wpdb->get_results("SELECT ID, post_date_gmt, post_title
+	FROM $wpdb->posts, $wpdb->postmeta
+	WHERE post_status='publish' and ID = post_id and meta_key = 'publication-type' and meta_value='news'		 
+	AND (DATEDIFF(CURDATE(), post_date_gmt)<=2) $includeMe
+	ORDER BY post_date_gmt DESC
+	LIMIT 0, 1000");
+
+	// Output sitemap data
+	foreach($rows as $row){
+		$xmlOutput.= "\t<url>\n";
+		$xmlOutput.= "\t\t<loc>";
+		$xmlOutput.= get_permalink($row->ID);
+		$xmlOutput.= "</loc>\n";
+		$xmlOutput.= "\t\t<news:news>\n";
+	
+		$xmlOutput.= "\t\t\t<news:publication>\n";
+		$xmlOutput.= "\t\t\t\t<news:name>";
+		if (null!= get_metadata("post",$row->ID,"publication-access",true)){
+			$xmlOutput.= htmlspecialchars(get_metadata("post",$row->ID,"publication-name",true));
+		} else {
+			$xmlOutput.= htmlspecialchars(get_option('blogname'));
+		}
+		$xmlOutput.= "</news:name>\n";
+		$xmlOutput.= "\t\t\t\t<news:language>";
+		$xmlOutput.= get_option('rss_language');
+		$xmlOutput.= "</news:language>\n";
+		$xmlOutput.= "\t\t\t</news:publication>\n";
+		if (null!= get_metadata("post",$row->ID,"publication-access",true)){
+			$xmlOutput.= "\t\t\t<news:access>";
+			$xmlOutput.= get_metadata("post",$row->ID,"publication-access",true);
+			$xmlOutput.= "</news:access>\n";
+		}
+		if (null!= get_metadata("post",$row->ID,"publication-geolocation",true)){
+			$xmlOutput.= "\t\t\t<news:geo_locations>";
+			$xmlOutput.= get_metadata("post",$row->ID,"publication-geolocation",true);
+			$xmlOutput.= "</news:geo_locations>\n";
+		}
+		if (null!= get_metadata("post",$row->ID,"publication-stocktickers",true)){
+			$xmlOutput.= "\t\t\t<news:stock_tickers>";
+			$xmlOutput.= get_metadata("post",$row->ID,"publication-stocktickers",true);
+			$xmlOutput.= "</news:stock_tickers>\n";
+		}
+		$xmlOutput.= "\t\t\t<news:publication_date>";
+		$thedate = substr($row->post_date_gmt, 0, 10);
+		$xmlOutput.= $thedate;
+		$xmlOutput.= "</news:publication_date>\n";
+		$xmlOutput.= "\t\t\t<news:title>";
+		$xmlOutput.= htmlspecialchars($row->post_title);
+		$xmlOutput.= "</news:title>\n";
+		if (null!= get_metadata("post",$row->ID,"publication-keywords",true)){
+			$xmlOutput.= "\t\t\t<news:keywords>";
+			$xmlOutput.= get_metadata("post",$row->ID,"publication-keywords",true);
+			$xmlOutput.= "</news:keywords>\n";
+		}
+		$xmlOutput.= "\t\t</news:news>\n";
+		$xmlOutput.= "\t</url>\n";
+		
+
+	}
+
+	// End urlset
+	$xmlOutput.= "</urlset>\n";
+
+	$xmlFile = ABSPATH."/skyword-google-news-sitemap.xml";
+	$fp = fopen($xmlFile, "w+"); // open the cache file "skyword-google-news-sitemap.xml" for writing
+	fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
+	fclose($fp); // close the file
+
+}
+
+function write_evergreen_sitemap(){
+
+	global $wpdb;
+	// Fetch options from database
+	$permalink_structure = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name='permalink_structure'");
+	$siteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options	WHERE option_name='siteurl'");
+	// Begin urlset
+
+	$xmlOutput.= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
+
+	$includeMe = 'AND post_type="post"';
+	$rows = $wpdb->get_results("SELECT ID, post_date_gmt, post_title
+	FROM $wpdb->posts, $wpdb->postmeta
+	WHERE post_status='publish' and ID = post_id and meta_key = 'publication-type' and meta_value='evergreen'		 
+	ORDER BY post_date_gmt DESC
+	LIMIT 0, 1000");
+
+	// Output sitemap data
+	foreach($rows as $row){
+		$xmlOutput.= "\t<url>\n";
+		$xmlOutput.= "\t\t<loc>";
+		$xmlOutput.= get_permalink($row->ID);
+		$xmlOutput.= "</loc>\n";
+		
+		$xmlOutput.= "\t\t<priority>";
+		$xmlOutput.= "0.9";
+		$xmlOutput.= "</priority>\n";
+		$xmlOutput.= "\t\t<changefrequency>";
+		$xmlOutput.= "yearly";
+		$xmlOutput.= "</changefrequency>\n";
+		$xmlOutput.= "\t</url>\n";
+		
+
+	}
+
+	// End urlset
+	$xmlOutput.= "</urlset>\n";
+
+	$xmlFile = ABSPATH."/skyword-sitemap.xml";
+	$fp = fopen($xmlFile, "w+"); // open the cache file "skyword-sitemap.xml" for writing
+	fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
+	fclose($fp); // close the file
+
+}
+
+	
 ?>
