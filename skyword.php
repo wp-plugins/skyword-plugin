@@ -83,12 +83,12 @@ function skyword_version($args){
 	global $wp_xmlrpc_server;
 	//Authenticate that posting user is valid
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-		return strval('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password);
+		return strval('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password);
 	}
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("Wordpress Versionews: ".get_bloginfo('version')." Plugin Versionews: 1.0.7");
+	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7");
 }
 function skyword_author($args){
 	$username	= $args[1];
@@ -97,7 +97,7 @@ function skyword_author($args){
 	global $wp_xmlrpc_server;
 	//Authenticate that posting user is valid
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-		return new IXR_Error(403, __('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password));
+		return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
 	}
 	if (!user_can($user->ID, 'edit_posts')){
 		return new IXR_Error(403, __('You do not have sufficient privileges to login.'));
@@ -113,7 +113,7 @@ function skyword_getAuthors($args){
 	$password	= $args[2];
 	global $wp_xmlrpc_server;
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-		return new IXR_Error(403, __('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password));
+		return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
 	}
 
 	if (!user_can($user->ID, 'edit_posts')){
@@ -142,7 +142,7 @@ function skyword_post($args){
 	
 	//Authenticate that posting user is valid
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-		return new IXR_Error(403, __('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password));
+		return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
 	}
 	
 	if (!user_can($user->ID, 'edit_posts')){
@@ -260,7 +260,7 @@ function skyword_newMediaObject($args) {
 
 		logIO('O', '(MW) Received '.strlen($bits).' bytes');
 		if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
-			return new IXR_Error(403, __('Invalid UN/PW Combinationews: UN = '.$username.' PW = '.$password));
+			return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
 		}
 		do_action('xmlrpc_call', 'metaWeblog.newMediaObject');
 
