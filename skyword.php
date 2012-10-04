@@ -3,7 +3,7 @@
 Plugin Name: Skyword
 Plugin URI: http://www.skyword.com
 Description: Integration with the Skyword content publication platform.
-Version: 1.0.7
+Version: 1.0.7.1
 Author: Skyword, Inc.
 Author URI: http://www.skyword.com
 License: GPL2
@@ -12,7 +12,7 @@ License: GPL2
 /*  Copyright 2012  Skyword, Inc.     This program is free software; you can redistribute it and/or modify    it under the terms of the GNU General Public License, version 2, as    published by the Free Software Foundation.     This program is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.     You should have received a copy of the GNU General Public License    along with this program; if not, write to the Free Software    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA */ 
 
 //Admin option page. Currently just a placeholder if necessary
-$versionNumber = "1.0.7";
+$versionNumber = "1.0.7.1";
 
 function skyword_admin(){
 	if (!current_user_can('manage_options'))  {
@@ -32,8 +32,8 @@ function skyword_admin_actions() {
 $packages['skyword'] = array(
 	'versions' => array(
 		'1.0.6' => array(
-			'version' => "1.0.7",
-			'date' => '2012-5-30',
+			'version' => "1.0.7.1",
+			'date' => '2012-10-04',
 			'author' => 'Stephen da Conceicao',
 			'requires' => '3.0',  // WP version required for plugin
 			'tested' => '3.0.1',  // WP version tested with
@@ -469,8 +469,12 @@ function write_google_news_sitemap(){
 
 	// End urlset
 	$xmlOutput.= "</urlset>\n";
-
-	$xmlFile = ABSPATH."/skyword-google-news-sitemap.xml";
+	$remove = array("http://", "www.");
+	$siteUrl = get_site_url();
+	$sitename = str_replace($remove, "", $siteUrl);
+	$sitenameA = explode(".",$sitename);
+	$smallName = $sitenameA[0];
+	$xmlFile = ABSPATH."/".$smallName."-skyword-google-news-sitemap.xml";
 	$fp = fopen($xmlFile, "w+"); // open the cache file "skyword-google-news-sitemap.xml" for writing
 	fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
 	fclose($fp); // close the file
@@ -514,8 +518,12 @@ function write_evergreen_sitemap(){
 
 	// End urlset
 	$xmlOutput.= "</urlset>\n";
-
-	$xmlFile = ABSPATH."/skyword-sitemap.xml";
+	$remove = array("http://", "www.");
+	$siteUrl = get_site_url();
+	$sitename = str_replace($remove, "", $siteUrl);
+	$sitenameA = explode(".",$sitename);
+	$smallName = $sitenameA[0];
+	$xmlFile = ABSPATH."/".$smallName."-skyword-sitemap.xml";
 	$fp = fopen($xmlFile, "w+"); // open the cache file "skyword-sitemap.xml" for writing
 	fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
 	fclose($fp); // close the file
