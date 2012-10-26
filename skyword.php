@@ -203,6 +203,7 @@ function skyword_post($args){
 			'post_excerpt' => $data['excerpt'],
 			'post_author' => $data['user-id'],
 			'post_type' => 'post',
+			'comment_status' => 'open',
 			'post_category' => $post_category
 		);
 	} else {
@@ -215,6 +216,7 @@ function skyword_post($args){
 			'post_excerpt' => $data['excerpt'],
 			'post_author' => $data['user-id'],
 			'post_type' => 'post',
+			'comment_status' => 'open',
 			'post_category' => $post_category
 		);
 	}
