@@ -3,7 +3,7 @@ Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.0.2
 Tested up to: 3.3
-Stable tag: 1.0.7.2
+Stable tag: 1.0.7.3
 
 Allows integration with the skyword publishing platform.
 
@@ -19,6 +19,9 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 1.0.7.3 =
+* Evergreen sitemap fix
+
 = 1.0.7.2 =
 * Added tracking tag shortcodes
 
