@@ -3,7 +3,7 @@
 Plugin Name: Skyword
 Plugin URI: http://www.skyword.com
 Description: Integration with the Skyword content publication platform.
-Version: 1.0.7.3
+Version: 1.0.7.4
 Author: Skyword, Inc.
 Author URI: http://www.skyword.com
 License: GPL2
@@ -12,7 +12,7 @@ License: GPL2
 /*  Copyright 2012  Skyword, Inc.     This program is free software; you can redistribute it and/or modify    it under the terms of the GNU General Public License, version 2, as    published by the Free Software Foundation.     This program is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.     You should have received a copy of the GNU General Public License    along with this program; if not, write to the Free Software    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA */ 
 
 //Admin option page. Currently just a placeholder if necessary
-$versionNumber = "1.0.7.3";
+$versionNumber = "1.0.7.4";
 
 function skyword_admin(){
 	if (!current_user_can('manage_options'))  {
@@ -32,8 +32,8 @@ function skyword_admin_actions() {
 $packages['skyword'] = array(
 	'versions' => array(
 		'1.0.6' => array(
-			'version' => "1.0.7.3",
-			'date' => '2012-10-31',
+			'version' => "1.0.7.4",
+			'date' => '2012-11-19',
 			'author' => 'Stephen da Conceicao',
 			'requires' => '3.0',  // WP version required for plugin
 			'tested' => '3.0.1',  // WP version tested with
@@ -91,7 +91,7 @@ function skyword_version($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7.3");
+	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7.4");
 }
 function skyword_version_number($args){
 	$username	= $args[1];
@@ -104,7 +104,7 @@ function skyword_version_number($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("1.073");
+	return strval("1.074");
 }
 function skyword_author($args){
 	$username	= $args[1];
@@ -483,7 +483,7 @@ function write_google_news_sitemap(){
 		}
 		$xmlOutput.= "</news:name>\n";
 		$xmlOutput.= "\t\t\t\t<news:language>";
-		$xmlOutput.= get_option('rss_language');
+		$xmlOutput.= substr(get_bloginfo('language'), 0, 2);
 		$xmlOutput.= "</news:language>\n";
 		$xmlOutput.= "\t\t\t</news:publication>\n";
 		if (null!= get_metadata("post",$row->ID,"publication-access",true)){
