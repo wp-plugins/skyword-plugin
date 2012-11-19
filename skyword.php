@@ -476,7 +476,7 @@ function write_google_news_sitemap(){
 	
 		$xmlOutput.= "\t\t\t<news:publication>\n";
 		$xmlOutput.= "\t\t\t\t<news:name>";
-		if (null!= get_metadata("post",$row->ID,"publication-access",true)){
+		if (null!= get_metadata("post",$row->ID,"publication-name",true)){
 			$xmlOutput.= htmlspecialchars(get_metadata("post",$row->ID,"publication-name",true));
 		} else {
 			$xmlOutput.= htmlspecialchars(get_option('blogname'));
