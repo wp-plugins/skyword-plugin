@@ -9,7 +9,7 @@ Allows integration with the skyword publishing platform.
 
 == Description ==
 
-Allows integration with the skyword publishing platform.
+[Skyword](http://www.skyword.com/)  is the leading comprehensive content production platform. The Skyword Platform enables brands, retailers, media companies, and agencies to acquire and engage customers by efficiently producing quality content optimized for search and the social web. Skyword for Agencies is an offshoot of the Skyword Platform designed to meet the specific needs of marketing and advertising agencies that manage content programs for multiple clients. Quality content is essential for reaching and engaging consumers today, but the creation process is messy, inconsistent and immeasurable. The Skyword Platforms make it easy to produce, optimize, and promote content at any scale to create meaningful, lasting relationships with customers. 
 
 == Installation ==
 
