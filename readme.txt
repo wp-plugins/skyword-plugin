@@ -1,8 +1,8 @@
 === Skyword API Plugin ===
 Contributors: skyword
 Tags: skyword, api
-Requires at least: 3.0.2
-Tested up to: 3.3
+Requires at least: 3.3
+Tested up to: 3.5
 Stable tag: 1.0.7.4
 
 Allows integration with the skyword publishing platform.
