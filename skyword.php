@@ -12,7 +12,7 @@ License: GPL2
 /*  Copyright 2012  Skyword, Inc.     This program is free software; you can redistribute it and/or modify    it under the terms of the GNU General Public License, version 2, as    published by the Free Software Foundation.     This program is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.     You should have received a copy of the GNU General Public License    along with this program; if not, write to the Free Software    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA */ 
 
 //Admin option page. Currently just a placeholder if necessary
-$versionNumber = "1.0.7.4";
+$versionNumber = "1.0.7.5";
 
 function skyword_admin(){
 	if (!current_user_can('manage_options'))  {
@@ -32,11 +32,11 @@ function skyword_admin_actions() {
 $packages['skyword'] = array(
 	'versions' => array(
 		'1.0.6' => array(
-			'version' => "1.0.7.4",
-			'date' => '2012-11-19',
+			'version' => "1.0.7.5",
+			'date' => '2012-12-19',
 			'author' => 'Stephen da Conceicao',
-			'requires' => '3.0',  // WP version required for plugin
-			'tested' => '3.0.1',  // WP version tested with
+			'requires' => '3.3',  // WP version required for plugin
+			'tested' => '3.5',  // WP version tested with
 			'homepage' => 'http://www.skyword.com',  // Your personal website
 			'external' => 'http://www.skyword.com',  // Site devoted to your plugin if available
 			'package' => 'http://www.skyword.com/plugins/wordpress/skyword.zip',  // The zip file of the plugin update
@@ -91,7 +91,7 @@ function skyword_version($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7.4");
+	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7.5");
 }
 function skyword_version_number($args){
 	$username	= $args[1];
@@ -104,7 +104,7 @@ function skyword_version_number($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("1.074");
+	return strval("1.075");
 }
 function skyword_author($args){
 	$username	= $args[1];
@@ -226,36 +226,36 @@ function skyword_post($args){
 	attach_attachments($post_id, $data);
 	//add content template/attachment information as meta 
 	create_custom_fields($post_id, $data);
-	delete_post_meta($post_id, 'tracking');
-	add_post_meta($post_id,'tracking',$data['tracking'], false);
+	delete_post_meta($post_id, 'skyword_tracking_tag');
+	add_post_meta($post_id,'skyword_tracking_tag',$data['tracking'], false);
 	//Create sitemap information
 	if ('news' == $data['publication-type']){
-		delete_post_meta($post_id,'publication-type');
-		add_post_meta($post_id, 'publication-type','news', false);
+		delete_post_meta($post_id,'skyword_publication_type');
+		add_post_meta($post_id, 'skyword_publication_type','news', false);
 		if (null != $data['publication-access']){
-			delete_post_meta($post_id,'publication-access');
-			add_post_meta($post_id, 'publication-access',$data['publication-access'], false);
+			delete_post_meta($post_id,'skyword_publication_access');
+			add_post_meta($post_id, 'skyword_publication_access',$data['publication-access'], false);
 		}
 		if (null != $data['publication-name']){
-			delete_post_meta($post_id,'publication-name');
-			add_post_meta($post_id, 'publication-name',$data['publication-name'], false);
+			delete_post_meta($post_id,'skyword_publication_name');
+			add_post_meta($post_id, 'skyword_publication_name',$data['publication-name'], false);
 		}
 		if (null != $data['publication-geolocation']){
-			delete_post_meta($post_id,'publication-geolocation');
-			add_post_meta($post_id, 'publication-geolocation',$data['publication-geolocation'], false);
+			delete_post_meta($post_id,'skyword_publication_geolocation');
+			add_post_meta($post_id, 'skyword_publication_geolocation',$data['publication-geolocation'], false);
 		}
 		if (null != $data['publication-keywords']){
-			delete_post_meta($post_id,'publication-keywords');
-			add_post_meta($post_id, 'publication-keywords',$data['publication-keywords'], false);
+			delete_post_meta($post_id,'skyword_publication_keywords');
+			add_post_meta($post_id, 'skyword_publication_keywords',$data['publication-keywords'], false);
 		}
 		if (null != $data['publication-stocktickers']){
-			delete_post_meta($post_id,'publication-stocktickers');
-			add_post_meta($post_id, 'publication-stocktickers',$data['publication-stocktickers'], false);
+			delete_post_meta($post_id,'skyword_publication_stocktickers');
+			add_post_meta($post_id, 'skyword_publication_stocktickers',$data['publication-stocktickers'], false);
 		}
 		write_google_news_sitemap();
 	} else {
-		delete_post_meta($post_id,'publication-type');
-		add_post_meta($post_id, 'publication-type','evergreen', false);
+		delete_post_meta($post_id,'skyword_publication_type');
+		add_post_meta($post_id, 'skyword_publication_type','evergreen', false);
 	}
 	
 	return strval($post_id);
@@ -351,7 +351,21 @@ function check_content_exists($skywordId){
 			return $str;
 		endwhile;
 	else :
-		return null;
+		$query = array(
+				'meta_key' => 'skywordid',
+				'meta_value' => $skywordId,
+				'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash')
+		);
+		query_posts($query);
+		if (have_posts()) :
+			while (have_posts()) : the_post();
+				$str = get_the_ID() ;
+				return $str;
+			endwhile;
+			return null;
+		else :
+			return null;
+		endif;
 	endif;
 }
 
@@ -408,7 +422,7 @@ function create_custom_fields($post_id, $data){
 	foreach ($custom_fields as $custom_field){
 		$fields = explode("-", $custom_field);
 		delete_post_meta($post_id, $fields[0]);
-		add_post_meta($post_id, $fields[0],$fields[1], false);
+		add_post_meta($post_id, $fields[0],str_replace("%3A",":",str_replace("%2d","-",$fields[1])), false);
 	}
 }
 
@@ -461,7 +475,7 @@ function write_google_news_sitemap(){
 	//Limit to last 2 days, 1000 items as google requires
 	$rows = $wpdb->get_results("SELECT ID, post_date_gmt, post_title
 	FROM $wpdb->posts, $wpdb->postmeta
-	WHERE post_status='publish' and ID = post_id and meta_key = 'publication-type' and meta_value='news'		 
+	WHERE post_status='publish' and ID = post_id and (meta_key = 'publication-type' or meta_key = 'skyword_publication_type')  and meta_value='news' 		 
 	AND (DATEDIFF(CURDATE(), post_date_gmt)<=2) $includeMe
 	ORDER BY post_date_gmt DESC
 	LIMIT 0, 1000");
@@ -479,7 +493,11 @@ function write_google_news_sitemap(){
 		if (null!= get_metadata("post",$row->ID,"publication-name",true)){
 			$xmlOutput.= htmlspecialchars(get_metadata("post",$row->ID,"publication-name",true));
 		} else {
-			$xmlOutput.= htmlspecialchars(get_option('blogname'));
+			if (null!= get_metadata("post",$row->ID,"skyword_publication_name",true)){
+				$xmlOutput.= htmlspecialchars(get_metadata("post",$row->ID,"skyword_publication_name",true));
+			}else {
+				$xmlOutput.= htmlspecialchars(get_option('blogname'));
+			}
 		}
 		$xmlOutput.= "</news:name>\n";
 		$xmlOutput.= "\t\t\t\t<news:language>";
@@ -490,16 +508,34 @@ function write_google_news_sitemap(){
 			$xmlOutput.= "\t\t\t<news:access>";
 			$xmlOutput.= get_metadata("post",$row->ID,"publication-access",true);
 			$xmlOutput.= "</news:access>\n";
+		} else {
+			if (null!= get_metadata("post",$row->ID,"skyword_publication_access",true)){
+				$xmlOutput.= "\t\t\t<news:access>";
+				$xmlOutput.= get_metadata("post",$row->ID,"skyword_publication_access",true);
+				$xmlOutput.= "</news:access>\n";
+			}
 		}
 		if (null!= get_metadata("post",$row->ID,"publication-geolocation",true)){
 			$xmlOutput.= "\t\t\t<news:geo_locations>";
 			$xmlOutput.= get_metadata("post",$row->ID,"publication-geolocation",true);
 			$xmlOutput.= "</news:geo_locations>\n";
+		} else {
+			if (null!= get_metadata("post",$row->ID,"skyword_publication_geolocation",true)){
+				$xmlOutput.= "\t\t\t<news:geo_locations>";
+				$xmlOutput.= get_metadata("post",$row->ID,"skyword_publication_geolocation",true);
+				$xmlOutput.= "</news:geo_locations>\n";
+			}
 		}
 		if (null!= get_metadata("post",$row->ID,"publication-stocktickers",true)){
 			$xmlOutput.= "\t\t\t<news:stock_tickers>";
 			$xmlOutput.= get_metadata("post",$row->ID,"publication-stocktickers",true);
 			$xmlOutput.= "</news:stock_tickers>\n";
+		} else {
+			if (null!= get_metadata("post",$row->ID,"skyword_publication_stocktickers",true)){
+				$xmlOutput.= "\t\t\t<news:stock_tickers>";
+				$xmlOutput.= get_metadata("post",$row->ID,"skyword_publication_stocktickers",true);
+				$xmlOutput.= "</news:stock_tickers>\n";
+			}
 		}
 		$xmlOutput.= "\t\t\t<news:publication_date>";
 		$thedate = substr($row->post_date_gmt, 0, 10);
@@ -512,6 +548,12 @@ function write_google_news_sitemap(){
 			$xmlOutput.= "\t\t\t<news:keywords>";
 			$xmlOutput.= get_metadata("post",$row->ID,"publication-keywords",true);
 			$xmlOutput.= "</news:keywords>\n";
+		} else {
+			if (null!= get_metadata("post",$row->ID,"skyword_publication_keywords",true)){
+				$xmlOutput.= "\t\t\t<news:keywords>";
+				$xmlOutput.= get_metadata("post",$row->ID,"skyword_publication_keywords",true);
+				$xmlOutput.= "</news:keywords>\n";
+			}
 		}
 		$xmlOutput.= "\t\t</news:news>\n";
 		$xmlOutput.= "\t</url>\n";
@@ -546,7 +588,7 @@ function write_evergreen_sitemap(){
 	$includeMe = 'AND post_type="post"';
 	$rows = $wpdb->get_results("SELECT ID, post_date_gmt, post_title
 	FROM $wpdb->posts, $wpdb->postmeta
-	WHERE post_status='publish' and ID = post_id and meta_key = 'publication-type' and meta_value='evergreen'		 
+	WHERE post_status='publish' and ID = post_id and  (meta_key = 'publication-type' or meta_key = 'skyword_publication_type')  and meta_value='evergreen'		 
 	ORDER BY post_date_gmt DESC
 	LIMIT 0, 1000");
 
