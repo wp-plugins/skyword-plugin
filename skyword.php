@@ -191,7 +191,7 @@ function skyword_post($args){
 			}
 	}
 	//check if content exists already
-	$data['post-id'] = check_content_exists($data['skyword-id']);
+	$data['post-id'] = check_content_exists($data['skyword_content_id']);
 	if (null != $data['post-id']){
 		//update existing post
 		$new_post = array(
