@@ -3,7 +3,7 @@
 Plugin Name: Skyword
 Plugin URI: http://www.skyword.com
 Description: Integration with the Skyword content publication platform.
-Version: 1.0.7.5
+Version: 1.0.7.6
 Author: Skyword, Inc.
 Author URI: http://www.skyword.com
 License: GPL2
@@ -12,7 +12,7 @@ License: GPL2
 /*  Copyright 2012  Skyword, Inc.     This program is free software; you can redistribute it and/or modify    it under the terms of the GNU General Public License, version 2, as    published by the Free Software Foundation.     This program is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.     You should have received a copy of the GNU General Public License    along with this program; if not, write to the Free Software    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA */ 
 
 //Admin option page. Currently just a placeholder if necessary
-$versionNumber = "1.0.7.5";
+$versionNumber = "1.0.7.6";
 
 function skyword_admin(){
 	if (!current_user_can('manage_options'))  {
@@ -32,7 +32,7 @@ function skyword_admin_actions() {
 $packages['skyword'] = array(
 	'versions' => array(
 		'1.0.6' => array(
-			'version' => "1.0.7.5",
+			'version' => "1.0.7.6",
 			'date' => '2012-12-19',
 			'author' => 'Stephen da Conceicao',
 			'requires' => '3.3',  // WP version required for plugin
@@ -91,7 +91,7 @@ function skyword_version($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7.5");
+	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7.6");
 }
 function skyword_version_number($args){
 	$username	= $args[1];
@@ -104,7 +104,7 @@ function skyword_version_number($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("1.075");
+	return strval("1.076");
 }
 function skyword_author($args){
 	$username	= $args[1];
@@ -379,21 +379,25 @@ function check_username_exists($user_name, $display_name, $first_name, $last_nam
 	$user_id = username_exists($user_name);
 	
 	if (!$user_id) {
-    	//Generate a random password
-    	$random_password = wp_generate_password(20, false);
-    	//Create the account
-		$user_id = wp_insert_user( array (
-			'first_name' => $first_name,
-			'last_name' => $last_name,
-			'user_nicename' => $user_name,
-			'display_name' => $display_name,
-			'user_email' => $email,
-			'role' => 1,
-			'user_login' => $user_name,
-			'user_pass' => $random_password,
-			'description' => $bio
-		)) ;
-
+		$olduser_name = str_replace("sw-","skywriter-",$user_name);
+		$user_id = username_exists($olduser_name);
+		if (!$user_id) {
+			
+	    	//Generate a random password
+	    	$random_password = wp_generate_password(20, false);
+	    	//Create the account
+			$user_id = wp_insert_user( array (
+				'first_name' => $first_name,
+				'last_name' => $last_name,
+				'user_nicename' => $user_name,
+				'display_name' => $display_name,
+				'user_email' => $email,
+				'role' => 1,
+				'user_login' => $user_name,
+				'user_pass' => $random_password,
+				'description' => $bio
+			)) ;
+		}
 	}
 	return $user_id;
 }
