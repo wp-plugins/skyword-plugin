@@ -3,7 +3,7 @@
 Plugin Name: Skyword
 Plugin URI: http://www.skyword.com
 Description: Integration with the Skyword content publication platform.
-Version: 1.0.7.6
+Version: 1.0.7.7
 Author: Skyword, Inc.
 Author URI: http://www.skyword.com
 License: GPL2
@@ -12,7 +12,7 @@ License: GPL2
 /*  Copyright 2012  Skyword, Inc.     This program is free software; you can redistribute it and/or modify    it under the terms of the GNU General Public License, version 2, as    published by the Free Software Foundation.     This program is distributed in the hope that it will be useful,    but WITHOUT ANY WARRANTY; without even the implied warranty of    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the    GNU General Public License for more details.     You should have received a copy of the GNU General Public License    along with this program; if not, write to the Free Software    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA */ 
 
 //Admin option page. Currently just a placeholder if necessary
-$versionNumber = "1.0.7.6";
+$versionNumber = "1.0.7.7";
 
 function skyword_admin(){
 	if (!current_user_can('manage_options'))  {
@@ -32,8 +32,8 @@ function skyword_admin_actions() {
 $packages['skyword'] = array(
 	'versions' => array(
 		'1.0.6' => array(
-			'version' => "1.0.7.6",
-			'date' => '2012-12-19',
+			'version' => "1.0.7.7",
+			'date' => '2012-1-31',
 			'author' => 'Stephen da Conceicao',
 			'requires' => '3.3',  // WP version required for plugin
 			'tested' => '3.5',  // WP version tested with
@@ -91,7 +91,7 @@ function skyword_version($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7.6");
+	return strval("Wordpress Version: ".get_bloginfo('version')." Plugin Version: 1.0.7.7");
 }
 function skyword_version_number($args){
 	$username	= $args[1];
@@ -104,7 +104,7 @@ function skyword_version_number($args){
 	if (!user_can($user->ID, 'edit_posts')){
 		return strval('You do not have sufficient privileges to login.');
 	}
-	return strval("1.076");
+	return strval("1.077");
 }
 function skyword_author($args){
 	$username	= $args[1];
@@ -155,7 +155,7 @@ function skyword_post($args){
 	$password	= $args[2]; 
 	$data = $args[3];
 	global $wp_xmlrpc_server;
-	
+	error_reporting(E_ALL ^ E_NOTICE);
 	//Authenticate that posting user is valid
 	if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
 		return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
