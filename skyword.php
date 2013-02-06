@@ -352,7 +352,7 @@ function check_content_exists($skywordId){
 		endwhile;
 	else :
 		$query = array(
-				'meta_key' => 'skywordid',
+				'meta_key' => 'skyword_content_id',
 				'meta_value' => $skywordId,
 				'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash')
 		);
