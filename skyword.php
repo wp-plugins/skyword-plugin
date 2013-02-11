@@ -508,12 +508,12 @@ function write_google_news_sitemap(){
 		$xmlOutput.= substr(get_bloginfo('language'), 0, 2);
 		$xmlOutput.= "</news:language>\n";
 		$xmlOutput.= "\t\t\t</news:publication>\n";
-		if (null!= get_metadata("post",$row->ID,"publication-access",true)){
+		if (null!= get_metadata("post",$row->ID,"publication-access",true) && get_metadata("post",$row->ID,"publication-access",true) != "Public" ){
 			$xmlOutput.= "\t\t\t<news:access>";
 			$xmlOutput.= get_metadata("post",$row->ID,"publication-access",true);
 			$xmlOutput.= "</news:access>\n";
 		} else {
-			if (null!= get_metadata("post",$row->ID,"skyword_publication_access",true)){
+			if (null!= get_metadata("post",$row->ID,"skyword_publication_access",true) && get_metadata("post",$row->ID,"skyword_publication_access",true) != "Public"){
 				$xmlOutput.= "\t\t\t<news:access>";
 				$xmlOutput.= get_metadata("post",$row->ID,"skyword_publication_access",true);
 				$xmlOutput.= "</news:access>\n";
