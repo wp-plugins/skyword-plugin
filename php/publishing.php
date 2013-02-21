@@ -97,7 +97,7 @@ class SkywordPublish {
 		$password	= $args[2]; 
 		$data = $args[3];
 		global $wp_xmlrpc_server;
-		error_reporting(E_ALL ^ E_NOTICE);
+		error_reporting(E_ERROR);
 		//Authenticate that posting user is valid
 		if ( !$user = $wp_xmlrpc_server->login($username, $password) ) {
 			return new IXR_Error(403, __('Invalid UN/PW Combination: UN = '.$username.' PW = '.$password));
