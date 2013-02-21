@@ -13,6 +13,7 @@ class SkywordOpengraph {
 		global $wp_query;
 		$current_post = $wp_query->post;
 		//Only display meta tags if on single post page
+		error_reporting(E_ERROR);
 		if (is_singular()){
 		 	$description = get_metadata("post",$current_post->ID,"skyword_metadescription",true);
 		 	$title = !(get_metadata("post",$current_post->ID,"skyword_metatitle",true)) ? $current_post->post_title : get_metadata("post",$current_post->ID,"skyword_metatitle",true);

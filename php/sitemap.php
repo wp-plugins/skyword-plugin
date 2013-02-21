@@ -43,7 +43,7 @@ class SkywordSitemaps {
 	}
 	
 	public function write_sitemaps(){
-		error_reporting(E_ALL ^ E_NOTICE);
+		error_reporting(E_ERROR);
 		$this->write_google_news_sitemap();
 		$this->write_evergreen_sitemap();
 	}
