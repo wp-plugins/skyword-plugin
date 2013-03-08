@@ -205,6 +205,7 @@ class SkywordPublish {
 	public function skyword_newMediaObject($args) {
 			global $wpdb;
 			global $wp_xmlrpc_server;
+			error_reporting(E_ERROR);
 			$blog_ID     = (int) $args[0];
 			$username  = $wpdb->escape($args[1]);
 			$password   = $wpdb->escape($args[2]);
