@@ -3,7 +3,7 @@
 Plugin Name: Skyword
 Plugin URI: http://www.skyword.com
 Description: Integration with the Skyword content publication platform.
-Version: 2.0.1
+Version: 2.0.2
 Author: Skyword, Inc.
 Author URI: http://www.skyword.com
 License: GPL2
