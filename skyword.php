@@ -14,9 +14,9 @@ License: GPL2
 if ( !defined('SKYWORD_PATH') )
 	define( 'SKYWORD_PATH', plugin_dir_path( __FILE__ ) );
 if ( !defined('SKYWORD_VERSION') )
-	define( 'SKYWORD_VERSION', "2.0.1" );
+	define( 'SKYWORD_VERSION', "2.0.2" );
 if ( !defined('SKYWORD_VN') )
-	define( 'SKYWORD_VN', "2.01" );
+	define( 'SKYWORD_VN', "2.02" );
 
 require SKYWORD_PATH.'php/publishing.php';
 require SKYWORD_PATH.'php/sitemap.php';

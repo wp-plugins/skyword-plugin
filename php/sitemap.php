@@ -95,17 +95,6 @@ class SkywordSitemaps {
 		$xmlOutput.= substr(get_bloginfo('language'), 0, 2);
 		$xmlOutput.= "</news:language>\n";
 		$xmlOutput.= "\t\t\t</news:publication>\n";
-		if (null!= get_metadata("post",$row->ID,"publication-access",true)){
-			$xmlOutput.= "\t\t\t<news:access>";
-			$xmlOutput.= get_metadata("post",$row->ID,"publication-access",true);
-			$xmlOutput.= "</news:access>\n";
-		} else {
-			if (null!= get_metadata("post",$row->ID,"skyword_publication_access",true)){
-				$xmlOutput.= "\t\t\t<news:access>";
-				$xmlOutput.= get_metadata("post",$row->ID,"skyword_publication_access",true);
-				$xmlOutput.= "</news:access>\n";
-			}
-		}
 		if (null!= get_metadata("post",$row->ID,"publication-geolocation",true)){
 			$xmlOutput.= "\t\t\t<news:geo_locations>";
 			$xmlOutput.= get_metadata("post",$row->ID,"publication-geolocation",true);
