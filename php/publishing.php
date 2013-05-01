@@ -174,7 +174,8 @@ class SkywordPublish {
 		$this->update_custom_field($post_id, 'skyword_metakeyword', $data['metakeyword']);
 		$this->update_custom_field($post_id, '_yoast_wpseo_title', $data['metatitle']);
 		$this->update_custom_field($post_id, '_yoast_wpseo_metadesc', $data['metadescription']);
-		$this->update_custom_field($post_id, '_yoast_wpseo_focuskw', $data['metakeyword']);
+		$this->update_custom_field($post_id, '_yoast_wpseo_focuskw', $data['keyword']);
+		$this->update_custom_field($post_id, 'skyword_content_id', $data['skyword_content_id']);
 		
 		//Create sitemap information
 		if ('news' == $data['publication-type']){
@@ -336,7 +337,7 @@ class SkywordPublish {
 					'user_nicename' => $user_name,
 					'display_name' => $display_name,
 					'user_email' => $email,
-					'role' => 1,
+					'role' => "author",
 					'user_login' => $user_name,
 					'user_pass' => $random_password,
 					'description' => $bio

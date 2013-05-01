@@ -20,7 +20,11 @@ class SkywordOpengraph {
 		 	$image = $this->getImage($current_post);		 	
 		 	echo "<meta property='og:title' content='".esc_attr($title)."'/>";
 			echo "<meta property='og:description' content='" .esc_attr($description)."'/>\n";
+			echo "<meta property='description' content='" .esc_attr($description)."'/>\n";
 			echo "<meta property='og:url' content='" .get_permalink($current_post->ID)."'/>\n";
+			if (null != get_metadata("post",$current_post->ID,"skyword_publication_keywords",true)){
+				echo "<meta property='news_keywords' content='" .get_metadata("post",$current_post->ID,"skyword_publication_keywords",true)."'/>\n";
+			}
 			echo "<meta property='og:site_name' content='" .get_option('blogname'). "'/>\n";
 			echo "<meta property='og:type' content='article'/>";
 			if (isset($image)){
