@@ -3,7 +3,7 @@ Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.3
 Tested up to: 3.5
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 
 Allows integration with the skyword publishing platform.
 
@@ -19,6 +19,9 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 2.0.4 =
+* Updated sitemap generation
+
 = 2.0.3 =
 * Added Google news keyword meta tag
 

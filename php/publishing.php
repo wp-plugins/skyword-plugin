@@ -198,6 +198,8 @@ class SkywordPublish {
 		} else {
 			$this->update_custom_field($post_id, 'skyword_publication_type','evergreen');
 		}
+		$skyword_sitemaps_inst = new SkywordSitemaps;
+		$skyword_sitemaps_inst->write_sitemaps();
 		
 		return strval($post_id);
 	
