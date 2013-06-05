@@ -16,15 +16,27 @@ class SkywordOpengraph {
 		error_reporting(E_ERROR);
 		if (is_singular()){
 		 	$description = get_metadata("post",$current_post->ID,"skyword_metadescription",true);
-		 	$title = !(get_metadata("post",$current_post->ID,"skyword_metatitle",true)) ? $current_post->post_title : get_metadata("post",$current_post->ID,"skyword_metatitle",true);
-		 	$image = $this->getImage($current_post);		 	
+            
+            if(null != get_metadata("post",$current_post->ID,"skyword_metatitle",true)){
+                $title = get_metadata("post",$current_post->ID,"skyword_metatitle",true);
+            } else if(null != get_metadata("post",$current_post->ID,"skyword_seo_title",true)){
+                $title = get_metadata("post",$current_post->ID,"skyword_seo_title",true);
+            } else {
+                $current_post->post_title;
+            }
+            
+            $image = $this->getImage($current_post);		 	
 		 	echo "<meta property='og:title' content='".esc_attr($title)."'/>";
 			echo "<meta property='og:description' content='" .esc_attr($description)."'/>\n";
 			echo "<meta property='description' content='" .esc_attr($description)."'/>\n";
 			echo "<meta property='og:url' content='" .get_permalink($current_post->ID)."'/>\n";
+            
 			if (null != get_metadata("post",$current_post->ID,"skyword_publication_keywords",true)){
 				echo "<meta property='news_keywords' content='" .get_metadata("post",$current_post->ID,"skyword_publication_keywords",true)."'/>\n";
-			}
+			} else if (null != get_metadata("post",$current_post->ID,"skyword_tags",true)) {
+                echo "<meta property='news_keywords' content='" .get_metadata("post",$current_post->ID,"skyword_tags",true)."'/>\n";
+            }
+            
 			echo "<meta property='og:site_name' content='" .get_option('blogname'). "'/>\n";
 			echo "<meta property='og:type' content='article'/>";
 			if (isset($image)){
@@ -38,8 +50,15 @@ class SkywordOpengraph {
 		global $wp_query;
 		$current_post = $wp_query->post;
 		//Only display meta tags if on single post page
+        
 		if (is_singular()){
-			return !(get_metadata("post",$current_post->ID,"skyword_metatitle",true)) ? $current_post->post_title : get_metadata("post",$current_post->ID,"skyword_metatitle",true)."  ";
+            if(null != get_metadata("post",$current_post->ID,"skyword_metatitle",true)){
+                return get_metadata("post",$current_post->ID,"skyword_metatitle",true);
+            } else if (null != get_metadata("post",$current_post->ID,"skyword_seo_title",true)){
+                return get_metadata("post",$current_post->ID,"skyword_seo_title",true);
+            } else {
+                return $current_post->post_title;
+            }
 		}
 	}
 	private function getImage($current_post){

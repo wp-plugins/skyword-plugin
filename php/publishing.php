@@ -169,9 +169,9 @@ class SkywordPublish {
 		//add content template/attachment information as meta 
 		$this->create_custom_fields($post_id, $data);
 		$this->update_custom_field($post_id, 'skyword_tracking_tag', $data['tracking']);
-		$this->update_custom_field($post_id, 'skyword_metatitle', $data['metatitle']);
+		$this->update_custom_field($post_id, 'skyword_seo_title', $data['metatitle']);
 		$this->update_custom_field($post_id, 'skyword_metadescription', $data['metadescription']);
-		$this->update_custom_field($post_id, 'skyword_metakeyword', $data['metakeyword']);
+		$this->update_custom_field($post_id, 'skyword_keyword', $data['metakeyword']);
 		$this->update_custom_field($post_id, '_yoast_wpseo_title', $data['metatitle']);
 		$this->update_custom_field($post_id, '_yoast_wpseo_metadesc', $data['metadescription']);
 		$this->update_custom_field($post_id, '_yoast_wpseo_focuskw', $data['keyword']);
@@ -187,20 +187,19 @@ class SkywordPublish {
 				$this->update_custom_field($post_id, 'skyword_publication_name',$data['publication-name']);
 			}
 			if (null != $data['publication-geolocation']){
-				$this->update_custom_field($post_id, 'skyword_publication_geolocation',$data['publication-geolocation']);
+				$this->update_custom_field($post_id, 'skyword_geolocation',$data['publication-geolocation']);
 			}
 			if (null != $data['publication-keywords']){
-				$this->update_custom_field($post_id, 'skyword_publication_keywords',$data['publication-keywords']);
+				$this->update_custom_field($post_id, 'skyword_tags',$data['publication-keywords']);
 			}
 			if (null != $data['publication-stocktickers']){
-				$this->update_custom_field($post_id, 'skyword_publication_stocktickers',$data['publication-stocktickers']);
+				$this->update_custom_field($post_id, 'skyword_stocktickers',$data['publication-stocktickers']);
 			}
 		} else {
 			$this->update_custom_field($post_id, 'skyword_publication_type','evergreen');
 		}
 		$skyword_sitemaps_inst = new SkywordSitemaps;
 		$skyword_sitemaps_inst->write_sitemaps();
-		
 		return strval($post_id);
 	
 	}
