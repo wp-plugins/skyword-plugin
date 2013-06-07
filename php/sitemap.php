@@ -10,9 +10,9 @@ class SkywordSitemaps {
         add_action('publish_post', array($this, 'write_sitemaps'));
         add_action('save_post', array($this, 'write_sitemaps'));
         add_action('delete_post', array($this, 'write_sitemaps'));
-        add_action('transition_post_status', array($this, 'write_sitemaps', 10, 3));
+        add_action('transition_post_status', array($this, 'write_sitemaps'));
         add_action('rebuild_sitemap', array($this, 'write_sitemaps'));
-        add_action('update_option_googlenewssitemap_excludeCat', array($this, 'write_sitemaps', 10, 2));
+        add_action('update_option_googlenewssitemap_excludeCat', array($this, 'write_sitemaps'));
         add_action('init', array($this, 'auto_robotstxt'));
     }
 
