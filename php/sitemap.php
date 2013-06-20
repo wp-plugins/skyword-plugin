@@ -54,6 +54,7 @@ class SkywordSitemaps {
     private function write_google_news_sitemap() {
 
         global $wpdb;
+        error_reporting(E_ERROR);
         // Fetch options from database
         $permalink_structure = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name='permalink_structure'");
         $siteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options	WHERE option_name='siteurl'");
@@ -182,15 +183,17 @@ class SkywordSitemaps {
         $sitenameA = explode(".", $sitename);
         $smallName = $sitenameA[0];
         $xmlFile = ABSPATH . "/" . $smallName . "-skyword-google-news-sitemap.xml";
-        $fp = fopen($xmlFile, "w+"); // open the cache file "skyword-google-news-sitemap.xml" for writing
-        fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
-        fclose($fp); // close the file
+        if (file_exists(ABSPATH)){
+	        $fp = fopen($xmlFile, "w+"); // open the cache file "skyword-google-news-sitemap.xml" for writing
+	        fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
+	        fclose($fp); // close the file
+        }
     }
 
     private function write_evergreen_sitemap() {
 
         global $wpdb;
-
+        error_reporting(E_ERROR);
         //Set smallName
         $remove = array("http://", "www.");
         $siteUrl = get_site_url();
@@ -232,10 +235,11 @@ class SkywordSitemaps {
         // End urlset
         $xmlOutput.= "</urlset>\n";
         $xmlFile = ABSPATH . "/" . $smallName . "-skyword-sitemap.xml";
-        $fp = fopen($xmlFile, "w+"); // open the cache file "skyword-sitemap.xml" for writing
-        fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
-        fclose($fp); // close the file
-        
+        if (file_exists(ABSPATH)){
+	        $fp = fopen($xmlFile, "w+"); // open the cache file "skyword-sitemap.xml" for writing
+	        fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
+	        fclose($fp); // close the file
+        }
         
         //Pages sitemap
         
@@ -277,10 +281,11 @@ class SkywordSitemaps {
 
         $xmlOutputPages.= "</urlset>\n";
         $xmlFilePages = ABSPATH . "/" . $smallName . "-skyword-pages-sitemap.xml";
-        $fpPages = fopen($xmlFilePages, "w+"); // open the cache file "skyword-pages-sitemap.xml" for writing
-        fwrite($fpPages, $xmlOutputPages); // save the contents of output buffer to the file
-        fclose($fpPages); // close the file
-        
+        if (file_exists(ABSPATH)){
+	        $fpPages = fopen($xmlFilePages, "w+"); // open the cache file "skyword-pages-sitemap.xml" for writing
+	        fwrite($fpPages, $xmlOutputPages); // save the contents of output buffer to the file
+	        fclose($fpPages); // close the file
+        }
         //Categories sitemap
         
         $categoryArgs = $args = array(
@@ -318,10 +323,11 @@ class SkywordSitemaps {
 
         $xmlOutputCat.= "</urlset>\n";
         $xmlFileCat = ABSPATH . "/" . $smallName . "-skyword-categories-sitemap.xml";
-        $fpCat = fopen($xmlFileCat, "w+"); // open the cache file "skyword-categories-sitemap.xml" for writing
-        fwrite($fpCat, $xmlOutputCat); // save the contents of output buffer to the file
-        fclose($fpCat); // close the file
-        
+        if (file_exists(ABSPATH)){
+	        $fpCat = fopen($xmlFileCat, "w+"); // open the cache file "skyword-categories-sitemap.xml" for writing
+	        fwrite($fpCat, $xmlOutputCat); // save the contents of output buffer to the file
+	        fclose($fpCat); // close the file
+        }
         //Tags sitemap
         
         $tagsArray = get_tags();
@@ -344,9 +350,11 @@ class SkywordSitemaps {
 
         $xmlOutputTags.= "</urlset>\n";
         $xmlFileTags = ABSPATH . "/" . $smallName . "-skyword-tags-sitemap.xml";
-        $fpTags = fopen($xmlFileTags, "w+"); // open the cache file "skyword-tags-sitemap.xml" for writing
-        fwrite($fpTags, $xmlOutputTags); // save the contents of output buffer to the file
-        fclose($fpTags); // close the file
+        if (file_exists(ABSPATH)){
+	        $fpTags = fopen($xmlFileTags, "w+"); // open the cache file "skyword-tags-sitemap.xml" for writing
+	        fwrite($fpTags, $xmlOutputTags); // save the contents of output buffer to the file
+	        fclose($fpTags); // close the file
+        }
     }
 
 }

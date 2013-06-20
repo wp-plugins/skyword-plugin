@@ -3,7 +3,7 @@ Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.3
 Tested up to: 3.5
-Stable tag: 2.0.5.1
+Stable tag: 2.0.5.2
 
 Allows integration with the skyword publishing platform.
 
@@ -19,6 +19,9 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 2.0.5.2 =
+* Only write sitemaps if ABSPATH directory is valid
+
 = 2.0.5.1 =
 * Fixed warning log message
 
