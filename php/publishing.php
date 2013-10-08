@@ -139,7 +139,7 @@ class SkywordPublish {
 			$new_post = array(
 				'ID' => html_entity_decode($data['post-id']),
 				'post_title' => html_entity_decode($data['title']),
-				'post_content' => html_entity_decode($data['description']),
+				'post_content' => $data['description'],
 				'post_status' => $state,
 				'post_date' => 	$post_date,
 				'post_excerpt' => $data['excerpt'],
@@ -152,7 +152,7 @@ class SkywordPublish {
 			//create new post
 			$new_post = array(
 				'post_title' => html_entity_decode($data['title']),
-				'post_content' => html_entity_decode($data['description']),
+				'post_content' => $data['description'],
 				'post_status' => $state,
 				'post_date' => 	$post_date,
 				'post_excerpt' => $data['excerpt'],
