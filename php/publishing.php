@@ -124,10 +124,11 @@ class SkywordPublish {
 		$post_category = array();
 		foreach ($categories as $category){
 			//check if category exists in system and create if it does not
-				$categoryName = htmlspecialchars(trim($category));
+				$categoryName = trim($category);
 				$this->check_category_exists($categoryName);
 				if (get_cat_ID($categoryName)==0){
-					$post_category[] = 1;
+					$this->check_category_exists(htmlspecialchars($categoryName));
+					$post_category[] = get_cat_ID(htmlspecialchars($categoryName));
 				} else {
 					$post_category[] = get_cat_ID($categoryName);
 				}
