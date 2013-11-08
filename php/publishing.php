@@ -285,8 +285,9 @@ class SkywordPublish {
 			return apply_filters( 'wp_handle_upload', array( 'file' => $name, 'url' => $upload[ 'url' ], 'type' => $type ), 'upload' );
 		}
 	
-	public function check_content_exists($skywordId){
+      public function check_content_exists($skywordId){
 		$query = array(
+		        'ignore_sticky_posts' => true,
 				'meta_key' => 'skywordid',
 				'meta_value' => $skywordId,
 				'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash')
@@ -299,6 +300,7 @@ class SkywordPublish {
 			endwhile;
 		else :
 			$query = array(
+			        'ignore_sticky_posts' => true,
 					'meta_key' => 'skyword_content_id',
 					'meta_value' => $skywordId,
 					'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash')
