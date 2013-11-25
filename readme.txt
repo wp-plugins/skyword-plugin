@@ -20,7 +20,10 @@ Allows integration with the skyword publishing platform.
 
 == Changelog ==
 = 2.0.5.3 =
-* Evergreen sitemap is now generic sitemap containing all posts
+* Admin panel
+
+= 2.0.5.2.1 =
+* Category escaping issue
 
 = 2.0.5.2 =
 * Only write sitemaps if ABSPATH directory is valid

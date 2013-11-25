@@ -18,7 +18,26 @@ if ( !defined('SKYWORD_VERSION') )
 if ( !defined('SKYWORD_VN') )
 	define( 'SKYWORD_VN', "2.053" );
 
+register_activation_hook(__FILE__, 'get_skyword_defaults');
+
+// Set defaults on initial plugin activation
+function get_skyword_defaults() {
+	$tmp = get_option('skyword_plugin_options');
+    if(!is_array($tmp)) {
+		$arr = array(
+		"skyword_api_key"=>null, 
+		"skyword_enable_ogtags" => true, 
+		"skyword_enable_metatags" => true, 
+		"skyword_enable_googlenewstag" => true,
+		"skyword_enable_pagetitle" => true,
+		"skyword_enable_sitemaps" => true
+		);
+		update_option('skyword_plugin_options', $arr);
+	}
+}
+
 require SKYWORD_PATH.'php/publishing.php';
 require SKYWORD_PATH.'php/sitemap.php';
 require SKYWORD_PATH.'php/shortcode.php';
 require SKYWORD_PATH.'php/opengraph.php';
+require SKYWORD_PATH.'php/options.php';
