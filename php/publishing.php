@@ -138,7 +138,7 @@ class SkywordPublish {
 			//update existing post
 			$new_post = array(
 				'ID' => html_entity_decode($data['post-id']),
-				'post_title' => html_entity_decode($data['title']),
+				'post_title' => $data['title'],
 				'post_content' => $data['description'],
 				'post_status' => $state,
 				'post_date' => 	$post_date,
@@ -151,7 +151,7 @@ class SkywordPublish {
 		} else {
 			//create new post
 			$new_post = array(
-				'post_title' => html_entity_decode($data['title']),
+				'post_title' => $data['title'],
 				'post_content' => $data['description'],
 				'post_status' => $state,
 				'post_date' => 	$post_date,
@@ -288,6 +288,7 @@ class SkywordPublish {
 	
 	public function check_content_exists($skywordId){
 		$query = array(
+		        'ignore_sticky_posts' => true,
 				'meta_key' => 'skywordid',
 				'meta_value' => $skywordId,
 				'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash')
@@ -300,6 +301,7 @@ class SkywordPublish {
 			endwhile;
 		else :
 			$query = array(
+			        'ignore_sticky_posts' => true,
 					'meta_key' => 'skyword_content_id',
 					'meta_value' => $skywordId,
 					'post_status' => array('publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash')
