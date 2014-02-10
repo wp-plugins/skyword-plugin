@@ -30,7 +30,12 @@ function get_skyword_defaults() {
 		"skyword_enable_metatags" => true, 
 		"skyword_enable_googlenewstag" => true,
 		"skyword_enable_pagetitle" => true,
-		"skyword_enable_sitemaps" => true
+		"skyword_enable_sitemaps" => true,
+		"skyword_generate_all_sitemaps" => true,
+		"skyword_generate_news_sitemaps" => true,
+		"skyword_generate_pages_sitemaps" => true,
+		"skyword_generate_categories_sitemaps" => true,
+		"skyword_generate_tags_sitemaps" => true
 		);
 		update_option('skyword_plugin_options', $arr);
 	}
@@ -41,3 +46,4 @@ require SKYWORD_PATH.'php/sitemap.php';
 require SKYWORD_PATH.'php/shortcode.php';
 require SKYWORD_PATH.'php/opengraph.php';
 require SKYWORD_PATH.'php/options.php';
+

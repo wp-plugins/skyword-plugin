@@ -26,6 +26,9 @@ class SkywordPublish
 		$methods['skyword_getCategories'] = array( $this, 'skyword_get_categories');
 		$methods['skyword_getTags'] = array( $this, 'skyword_get_tags');
 		$methods['skyword_getPost'] = array( $this, 'skyword_get_post');
+		$methods['skyword_deletePost'] = array( $this, 'skyword_delete_post');
+		
+		
 		return $methods;
 	}
 	public function skyword_version($args)
@@ -50,6 +53,7 @@ class SkywordPublish
 	{
 		$login = $this->skyword_login($args);
 		if ($login['status']=="success") {
+			$data = $args[3];
 			$user_id = $this->check_username_exists($data['user-name'], $data['display-name'], $data['first-name'], $data['last-name'], $data['email'], $data['bio']);
 			return strval($user_id);
 		} else {
@@ -144,6 +148,31 @@ class SkywordPublish
 			return $login['message'];
 		}
 	}
+
+	function skyword_delete_post( $args = '' )
+	{
+		
+		$login = $this->skyword_login($args);
+		if ($login['status']=="success") {
+			do_action( 'xmlrpc_call', 'wp.deletePost' );
+			$post = get_post( $post_id, ARRAY_A );
+			if ( empty( $post['ID'] ) )
+				return new IXR_Error( 404, __( 'Invalid post ID.' ) );
+	
+	
+			$result = wp_delete_post( $post_id );
+	
+			if ( ! $result )
+				return new IXR_Error( 500, __( 'The post cannot be deleted.' ) );
+	
+			return true;
+		} else {
+			return $login['message'];
+		}		
+		
+	}
+
+
 
 	//Code which generates all post information
 	public function skyword_post($args)
@@ -435,7 +464,6 @@ class SkywordPublish
 	private function check_username_exists($user_name, $display_name, $first_name, $last_name, $email, $bio)
 	{
 		$user_id = username_exists($user_name);
-
 		if (!$user_id) {
 			$olduser_name = str_replace("sw-", "skywriter-", $user_name);
 			$user_id = username_exists($olduser_name);

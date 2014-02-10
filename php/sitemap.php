@@ -43,11 +43,17 @@ class SkywordSitemaps
 		print "User-agent: * \n";
 		print "Disallow: /wp-admin/ \n";
 		print "Disallow: /wp-includes/ \n \n";
-		print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-sitemap.xml \n";
-		print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-pages-sitemap.xml \n";
-		print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-categories-sitemap.xml \n";
-		print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-tags-sitemap.xml \n";
-		print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-google-news-sitemap.xml \n";
+		$options = get_option('skyword_plugin_options');
+		if ($options['skyword_generate_all_sitemaps']) 
+			print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-sitemap.xml \n";
+		if ($options['skyword_generate_pages_sitemaps']) 
+			print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-pages-sitemap.xml \n";
+		if ($options['skyword_generate_categories_sitemaps']) 
+			print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-categories-sitemap.xml \n";
+		if ($options['skyword_generate_tags_sitemaps']) 
+			print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-tags-sitemap.xml \n";
+		if ($options['skyword_generate_news_sitemaps']) 
+			print "Sitemap: " . get_site_url() . "/" . $smallName . "-skyword-google-news-sitemap.xml \n";
 		die;
 	}
 
@@ -64,147 +70,149 @@ class SkywordSitemaps
 
 	private function write_google_news_sitemap()
 	{
-
-		global $wpdb;
-		error_reporting(E_ERROR);
-		// Fetch options from database
-		$permalink_structure = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name='permalink_structure'");
-		$siteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options	WHERE option_name='siteurl'");
-		// Begin urlset
-		$xmlOutput.= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:news=\"http://www.google.com/schemas/sitemap-news/0.9\">\n";
-
-		$includeMe = 'AND post_type="post"';
-		//Exclude categories
-		if (get_option('googlenewssitemap_excludeCat') <> NULL) {
-			$exPosts = get_objects_in_term(get_option('googlenewssitemap_excludeCat'), "category");
-			$includeMe.= ' AND ID NOT IN (' . implode(",", $exPosts) . ')';
-		}
-
-		//Limit to last 2 days, 1000 items as google requires
-		$rows = $wpdb->get_results("SELECT ID, post_date_gmt, post_title
-				FROM $wpdb->posts, $wpdb->postmeta
-				WHERE post_status='publish' and ID = post_id and (meta_key = 'publication-type' or meta_key = 'skyword_publication_type')  and meta_value='news'
-				AND (DATEDIFF(CURDATE(), post_date_gmt)<=2) $includeMe
-				ORDER BY post_date_gmt DESC
-				LIMIT 0, 1000");
-
-		// Output sitemap data
-		foreach ($rows as $row) {
-
-			//Sets news:name
-			if (null != get_metadata("post", $row->ID, "publication-name", true)) {
-				$newsName = get_metadata("post", $row->ID, "publication-name", true);
-			} else if (null != get_metadata("post", $row->ID, "skyword_publication_name", true)) {
-					$newsName = get_metadata("post", $row->ID, "skyword_publication_name", true);
-				} else {
-				$newsName = get_option('blogname');
+		$options = get_option('skyword_plugin_options');
+		if ($options['skyword_generate_news_sitemaps']) {
+			global $wpdb;
+			error_reporting(E_ERROR);
+			// Fetch options from database
+			$permalink_structure = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name='permalink_structure'");
+			$siteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options	WHERE option_name='siteurl'");
+			// Begin urlset
+			$xmlOutput.= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:news=\"http://www.google.com/schemas/sitemap-news/0.9\">\n";
+	
+			$includeMe = 'AND post_type="post"';
+			//Exclude categories
+			if (get_option('googlenewssitemap_excludeCat') <> NULL) {
+				$exPosts = get_objects_in_term(get_option('googlenewssitemap_excludeCat'), "category");
+				$includeMe.= ' AND ID NOT IN (' . implode(",", $exPosts) . ')';
 			}
-
-			//Sets news:access values
-			if (null != get_metadata("post", $row->ID, "publication-access", true)) {
-				$newsAccess = get_metadata("post", $row->ID, "publication-access", true);
-			} else if (null != get_metadata("post", $row->ID, "skyword_publication_access", true)) {
-					$newsAccess = get_metadata("post", $row->ID, "skyword_publication_access", true);
+	
+			//Limit to last 2 days, 1000 items as google requires
+			$rows = $wpdb->get_results("SELECT ID, post_date_gmt, post_title
+					FROM $wpdb->posts, $wpdb->postmeta
+					WHERE post_status='publish' and ID = post_id and (meta_key = 'publication-type' or meta_key = 'skyword_publication_type')  and meta_value='news'
+					AND (DATEDIFF(CURDATE(), post_date_gmt)<=2) $includeMe
+					ORDER BY post_date_gmt DESC
+					LIMIT 0, 1000");
+	
+			// Output sitemap data
+			foreach ($rows as $row) {
+	
+				//Sets news:name
+				if (null != get_metadata("post", $row->ID, "publication-name", true)) {
+					$newsName = get_metadata("post", $row->ID, "publication-name", true);
+				} else if (null != get_metadata("post", $row->ID, "skyword_publication_name", true)) {
+						$newsName = get_metadata("post", $row->ID, "skyword_publication_name", true);
+					} else {
+					$newsName = get_option('blogname');
 				}
-
-			//Sets news:geo_locations
-			if (null != get_metadata("post", $row->ID, "publication-geolocation", true)) {
-				$newsGeoLocations = get_metadata("post", $row->ID, "publication-geolocation", true);
-			} else if (null != get_metadata("post", $row->ID, "skyword_publication_geolocation", true)) {
-					$newsGeoLocations = get_metadata("post", $row->ID, "skyword_publication_geolocation", true);
-				} else if (null != get_metadata("post", $row->ID, "skyword_geolocation", true)) {
-					$newsGeoLocations = get_metadata("post", $row->ID, "skyword_geolocation", true);
+	
+				//Sets news:access values
+				if (null != get_metadata("post", $row->ID, "publication-access", true)) {
+					$newsAccess = get_metadata("post", $row->ID, "publication-access", true);
+				} else if (null != get_metadata("post", $row->ID, "skyword_publication_access", true)) {
+						$newsAccess = get_metadata("post", $row->ID, "skyword_publication_access", true);
+					}
+	
+				//Sets news:geo_locations
+				if (null != get_metadata("post", $row->ID, "publication-geolocation", true)) {
+					$newsGeoLocations = get_metadata("post", $row->ID, "publication-geolocation", true);
+				} else if (null != get_metadata("post", $row->ID, "skyword_publication_geolocation", true)) {
+						$newsGeoLocations = get_metadata("post", $row->ID, "skyword_publication_geolocation", true);
+					} else if (null != get_metadata("post", $row->ID, "skyword_geolocation", true)) {
+						$newsGeoLocations = get_metadata("post", $row->ID, "skyword_geolocation", true);
+					}
+	
+				//Set news:stock_tickers
+				if (null != get_metadata("post", $row->ID, "publication-stocktickers", true)) {
+					$newsStockTickers = get_metadata("post", $row->ID, "publication-stocktickers", true);
+				} else if (null != get_metadata("post", $row->ID, "skyword_publication_stocktickers", true)) {
+						$newsStockTickers = get_metadata("post", $row->ID, "skyword_publication_stocktickers", true);
+					} else if (null != get_metadata("post", $row->ID, "skyword_stocktickers", true)) {
+						$newsStockTickers = get_metadata("post", $row->ID, "skyword_stocktickers", true);
+					}
+	
+				//Set news:keywords
+				if (null != get_metadata("post", $row->ID, "publication-keywords", true)) {
+					$newsKeywords = get_metadata("post", $row->ID, "publication-keywords", true);
+				} else if (null != get_metadata("post", $row->ID, "skyword_publication_keywords", true)) {
+						$newsKeywords = get_metadata("post", $row->ID, "skyword_publication_keywords", true);
+					} else if (null != get_metadata("post", $row->ID, "skyword_tags", true)) {
+						$newsKeywords = get_metadata("post", $row->ID, "skyword_tags", true);
+					}
+	
+				$xmlOutput.= "\t<url>\n";
+				$xmlOutput.= "\t\t<loc>";
+				$xmlOutput.= get_permalink($row->ID);
+				$xmlOutput.= "</loc>\n";
+				$xmlOutput.= "\t\t<news:news>\n";
+	
+				$xmlOutput.= "\t\t\t<news:publication>\n";
+				$xmlOutput.= "\t\t\t\t<news:name>";
+	
+				$xmlOutput.=htmlspecialchars($newsName);
+	
+				$xmlOutput.= "</news:name>\n";
+				$xmlOutput.= "\t\t\t\t<news:language>";
+				$xmlOutput.= substr(get_bloginfo('language'), 0, 2);
+				$xmlOutput.= "</news:language>\n";
+				$xmlOutput.= "\t\t\t</news:publication>\n";
+	
+				if (isset($newsAccess)) {
+					$xmlOutput.= "\t\t\t<news:access>";
+					$xmlOutput.= $newsAccess;
+					$xmlOutput.= "</news:access>\n";
 				}
-
-			//Set news:stock_tickers
-			if (null != get_metadata("post", $row->ID, "publication-stocktickers", true)) {
-				$newsStockTickers = get_metadata("post", $row->ID, "publication-stocktickers", true);
-			} else if (null != get_metadata("post", $row->ID, "skyword_publication_stocktickers", true)) {
-					$newsStockTickers = get_metadata("post", $row->ID, "skyword_publication_stocktickers", true);
-				} else if (null != get_metadata("post", $row->ID, "skyword_stocktickers", true)) {
-					$newsStockTickers = get_metadata("post", $row->ID, "skyword_stocktickers", true);
+	
+				if (isset($newsGeoLocations)) {
+					$xmlOutput.= "\t\t\t<news:geo_locations>";
+					$xmlOutput.= $newsGeoLocations;
+					$xmlOutput.= "</news:geo_locations>\n";
 				}
-
-			//Set news:keywords
-			if (null != get_metadata("post", $row->ID, "publication-keywords", true)) {
-				$newsKeywords = get_metadata("post", $row->ID, "publication-keywords", true);
-			} else if (null != get_metadata("post", $row->ID, "skyword_publication_keywords", true)) {
-					$newsKeywords = get_metadata("post", $row->ID, "skyword_publication_keywords", true);
-				} else if (null != get_metadata("post", $row->ID, "skyword_tags", true)) {
-					$newsKeywords = get_metadata("post", $row->ID, "skyword_tags", true);
+	
+				if (isset($newsStockTickers)) {
+					$xmlOutput.= "\t\t\t<news:stock_tickers>";
+					$xmlOutput.= $newsStockTickers;
+					$xmlOutput.= "</news:stock_tickers>\n";
 				}
-
-			$xmlOutput.= "\t<url>\n";
-			$xmlOutput.= "\t\t<loc>";
-			$xmlOutput.= get_permalink($row->ID);
-			$xmlOutput.= "</loc>\n";
-			$xmlOutput.= "\t\t<news:news>\n";
-
-			$xmlOutput.= "\t\t\t<news:publication>\n";
-			$xmlOutput.= "\t\t\t\t<news:name>";
-
-			$xmlOutput.=htmlspecialchars($newsName);
-
-			$xmlOutput.= "</news:name>\n";
-			$xmlOutput.= "\t\t\t\t<news:language>";
-			$xmlOutput.= substr(get_bloginfo('language'), 0, 2);
-			$xmlOutput.= "</news:language>\n";
-			$xmlOutput.= "\t\t\t</news:publication>\n";
-
-			if (isset($newsAccess)) {
-				$xmlOutput.= "\t\t\t<news:access>";
-				$xmlOutput.= $newsAccess;
-				$xmlOutput.= "</news:access>\n";
+	
+				$xmlOutput.= "\t\t\t<news:publication_date>";
+				$thedate = substr($row->post_date_gmt, 0, 10);
+				$xmlOutput.= $thedate;
+				$xmlOutput.= "</news:publication_date>\n";
+				$xmlOutput.= "\t\t\t<news:title>";
+				$xmlOutput.= htmlspecialchars($row->post_title);
+				$xmlOutput.= "</news:title>\n";
+	
+				if (isset($newsKeywords)) {
+					$xmlOutput.= "\t\t\t<news:keywords>";
+					$xmlOutput.= $newsKeywords;
+					$xmlOutput.= "</news:keywords>\n";
+				}
+	
+				$xmlOutput.= "\t\t</news:news>\n";
+				$xmlOutput.= "\t</url>\n";
 			}
-
-			if (isset($newsGeoLocations)) {
-				$xmlOutput.= "\t\t\t<news:geo_locations>";
-				$xmlOutput.= $newsGeoLocations;
-				$xmlOutput.= "</news:geo_locations>\n";
+	
+			// End urlset
+			$xmlOutput.= "</urlset>\n";
+			$remove = array("http://", "www.");
+			$siteUrl = get_site_url();
+			$sitename = str_replace($remove, "", $siteUrl);
+			$sitenameA = explode(".", $sitename);
+			$smallName = $sitenameA[0];
+			$xmlFile = ABSPATH . "/" . $smallName . "-skyword-google-news-sitemap.xml";
+			if (file_exists(ABSPATH)) {
+				$fp = fopen($xmlFile, "w+"); // open the cache file "skyword-google-news-sitemap.xml" for writing
+				fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
+				fclose($fp); // close the file
 			}
-
-			if (isset($newsStockTickers)) {
-				$xmlOutput.= "\t\t\t<news:stock_tickers>";
-				$xmlOutput.= $newsStockTickers;
-				$xmlOutput.= "</news:stock_tickers>\n";
-			}
-
-			$xmlOutput.= "\t\t\t<news:publication_date>";
-			$thedate = substr($row->post_date_gmt, 0, 10);
-			$xmlOutput.= $thedate;
-			$xmlOutput.= "</news:publication_date>\n";
-			$xmlOutput.= "\t\t\t<news:title>";
-			$xmlOutput.= htmlspecialchars($row->post_title);
-			$xmlOutput.= "</news:title>\n";
-
-			if (isset($newsKeywords)) {
-				$xmlOutput.= "\t\t\t<news:keywords>";
-				$xmlOutput.= $newsKeywords;
-				$xmlOutput.= "</news:keywords>\n";
-			}
-
-			$xmlOutput.= "\t\t</news:news>\n";
-			$xmlOutput.= "\t</url>\n";
-		}
-
-		// End urlset
-		$xmlOutput.= "</urlset>\n";
-		$remove = array("http://", "www.");
-		$siteUrl = get_site_url();
-		$sitename = str_replace($remove, "", $siteUrl);
-		$sitenameA = explode(".", $sitename);
-		$smallName = $sitenameA[0];
-		$xmlFile = ABSPATH . "/" . $smallName . "-skyword-google-news-sitemap.xml";
-		if (file_exists(ABSPATH)) {
-			$fp = fopen($xmlFile, "w+"); // open the cache file "skyword-google-news-sitemap.xml" for writing
-			fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
-			fclose($fp); // close the file
 		}
 	}
 
 	private function write_evergreen_sitemap()
 	{
-
+		$options = get_option('skyword_plugin_options');
 		global $wpdb;
 		error_reporting(E_ERROR);
 		//Set smallName
@@ -213,159 +221,167 @@ class SkywordSitemaps
 		$sitename = str_replace($remove, "", $siteUrl);
 		$sitenameA = explode(".", $sitename);
 		$smallName = $sitenameA[0];
+		if ($options['skyword_generate_all_sitemaps']) {
+			//Evergreen sitemap
+			// Fetch options from database
+			$permalink_structure = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name='permalink_structure'");
+			$siteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options	WHERE option_name='siteurl'");
+			// Begin urlset
+	
+			$xmlOutput.= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
+	
+			$rows = $wpdb->get_results("SELECT ID, post_date_gmt, post_title
+					FROM $wpdb->posts
+					WHERE post_status='publish' and post_type='post'
+					ORDER BY post_date_gmt DESC
+					LIMIT 0, 1000");
+	
+			// Output sitemap data
+			foreach ($rows as $row) {
+				$xmlOutput.= "\t<url>\n";
+				$xmlOutput.= "\t\t<loc>";
+				$xmlOutput.= get_permalink($row->ID);
+				$xmlOutput.= "</loc>\n";
+	
+				$xmlOutput.= "\t\t<priority>";
+				$xmlOutput.= "0.9";
+				$xmlOutput.= "</priority>\n";
+				$xmlOutput.= "\t\t<changefreq>";
+				$xmlOutput.= "yearly";
+				$xmlOutput.= "</changefreq>\n";
+				$xmlOutput.= "\t</url>\n";
+			}
+	
+			// End urlset
+			$xmlOutput.= "</urlset>\n";
+			$xmlFile = ABSPATH . "/" . $smallName . "-skyword-sitemap.xml";
+			if (file_exists(ABSPATH)) {
+				$fp = fopen($xmlFile, "w+"); // open the cache file "skyword-sitemap.xml" for writing
+				fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
+				fclose($fp); // close the file
+			}
 
-		//Evergreen sitemap
-		// Fetch options from database
-		$permalink_structure = $wpdb->get_var("SELECT option_value FROM $wpdb->options WHERE option_name='permalink_structure'");
-		$siteurl = $wpdb->get_var("SELECT option_value FROM $wpdb->options	WHERE option_name='siteurl'");
-		// Begin urlset
-
-		$xmlOutput.= "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
-
-		$rows = $wpdb->get_results("SELECT ID, post_date_gmt, post_title
-				FROM $wpdb->posts
-				WHERE post_status='publish' and post_type='post'
-				ORDER BY post_date_gmt DESC
-				LIMIT 0, 1000");
-
-		// Output sitemap data
-		foreach ($rows as $row) {
-			$xmlOutput.= "\t<url>\n";
-			$xmlOutput.= "\t\t<loc>";
-			$xmlOutput.= get_permalink($row->ID);
-			$xmlOutput.= "</loc>\n";
-
-			$xmlOutput.= "\t\t<priority>";
-			$xmlOutput.= "0.9";
-			$xmlOutput.= "</priority>\n";
-			$xmlOutput.= "\t\t<changefreq>";
-			$xmlOutput.= "yearly";
-			$xmlOutput.= "</changefreq>\n";
-			$xmlOutput.= "\t</url>\n";
 		}
-
-		// End urlset
-		$xmlOutput.= "</urlset>\n";
-		$xmlFile = ABSPATH . "/" . $smallName . "-skyword-sitemap.xml";
-		if (file_exists(ABSPATH)) {
-			$fp = fopen($xmlFile, "w+"); // open the cache file "skyword-sitemap.xml" for writing
-			fwrite($fp, $xmlOutput); // save the contents of output buffer to the file
-			fclose($fp); // close the file
+		
+		if ($options['skyword_generate_pages_sitemaps']) {
+			//Pages sitemap
+	
+			$pagesArgs = array(
+				'sort_order' => 'ASC',
+				'sort_column' => 'post_title',
+				'hierarchical' => 1,
+				'exclude' => '',
+				'include' => '',
+				'meta_key' => '',
+				'meta_value' => '',
+				'authors' => '',
+				'child_of' => 0,
+				'parent' => -1,
+				'exclude_tree' => '',
+				'number' => '',
+				'offset' => 0,
+				'post_type' => 'page',
+				'post_status' => 'publish'
+			);
+			$pagesArray = get_pages($pagesArgs);
+	
+			$xmlOutputPages = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
+	
+			foreach ($pagesArray as $page) {
+				$xmlOutputPages.= "\t<url>\n";
+				$xmlOutputPages.= "\t\t<loc>";
+				$xmlOutputPages.= get_site_url() ."/". $page->post_name;
+				$xmlOutputPages.= "</loc>\n";
+	
+				$xmlOutputPages.= "\t\t<priority>";
+				$xmlOutputPages.= "0.9";
+				$xmlOutputPages.= "</priority>\n";
+				$xmlOutputPages.= "\t\t<changefreq>";
+				$xmlOutputPages.= "yearly";
+				$xmlOutputPages.= "</changefreq>\n";
+				$xmlOutputPages.= "\t</url>\n";
+			}
+	
+			$xmlOutputPages.= "</urlset>\n";
+			$xmlFilePages = ABSPATH . "/" . $smallName . "-skyword-pages-sitemap.xml";
+			if (file_exists(ABSPATH)) {
+				$fpPages = fopen($xmlFilePages, "w+"); // open the cache file "skyword-pages-sitemap.xml" for writing
+				fwrite($fpPages, $xmlOutputPages); // save the contents of output buffer to the file
+				fclose($fpPages); // close the file
+			}
 		}
-
-		//Pages sitemap
-
-		$pagesArgs = array(
-			'sort_order' => 'ASC',
-			'sort_column' => 'post_title',
-			'hierarchical' => 1,
-			'exclude' => '',
-			'include' => '',
-			'meta_key' => '',
-			'meta_value' => '',
-			'authors' => '',
-			'child_of' => 0,
-			'parent' => -1,
-			'exclude_tree' => '',
-			'number' => '',
-			'offset' => 0,
-			'post_type' => 'page',
-			'post_status' => 'publish'
-		);
-		$pagesArray = get_pages($pagesArgs);
-
-		$xmlOutputPages = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
-
-		foreach ($pagesArray as $page) {
-			$xmlOutputPages.= "\t<url>\n";
-			$xmlOutputPages.= "\t\t<loc>";
-			$xmlOutputPages.= get_site_url() ."/". $page->post_name;
-			$xmlOutputPages.= "</loc>\n";
-
-			$xmlOutputPages.= "\t\t<priority>";
-			$xmlOutputPages.= "0.9";
-			$xmlOutputPages.= "</priority>\n";
-			$xmlOutputPages.= "\t\t<changefreq>";
-			$xmlOutputPages.= "yearly";
-			$xmlOutputPages.= "</changefreq>\n";
-			$xmlOutputPages.= "\t</url>\n";
+		if ($options['skyword_generate_categories_sitemaps']) {
+			//Categories sitemap
+	
+			$categoryArgs = $args = array(
+				'type' => 'post',
+				'child_of' => 0,
+				'parent' => '',
+				'orderby' => 'name',
+				'order' => 'ASC',
+				'hide_empty' => 1,
+				'hierarchical' => 1,
+				'exclude' => '',
+				'include' => '',
+				'number' => '',
+				'taxonomy' => 'category',
+				'pad_counts' => false);
+	
+			$categoriesArray = get_categories($categoryArgs);
+	
+			$xmlOutputCat = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
+	
+			foreach ($categoriesArray as $category) {
+				$xmlOutputCat.= "\t<url>\n";
+				$xmlOutputCat.= "\t\t<loc>";
+				$xmlOutputCat.= get_category_link($category->cat_ID);
+				$xmlOutputCat.= "</loc>\n";
+	
+				$xmlOutputCat.= "\t\t<priority>";
+				$xmlOutputCat.= "0.9";
+				$xmlOutputCat.= "</priority>\n";
+				$xmlOutputCat.= "\t\t<changefreq>";
+				$xmlOutputCat.= "yearly";
+				$xmlOutputCat.= "</changefreq>\n";
+				$xmlOutputCat.= "\t</url>\n";
+			}
+	
+			$xmlOutputCat.= "</urlset>\n";
+			$xmlFileCat = ABSPATH . "/" . $smallName . "-skyword-categories-sitemap.xml";
+			if (file_exists(ABSPATH)) {
+				$fpCat = fopen($xmlFileCat, "w+"); // open the cache file "skyword-categories-sitemap.xml" for writing
+				fwrite($fpCat, $xmlOutputCat); // save the contents of output buffer to the file
+				fclose($fpCat); // close the file
+			}
 		}
-
-		$xmlOutputPages.= "</urlset>\n";
-		$xmlFilePages = ABSPATH . "/" . $smallName . "-skyword-pages-sitemap.xml";
-		if (file_exists(ABSPATH)) {
-			$fpPages = fopen($xmlFilePages, "w+"); // open the cache file "skyword-pages-sitemap.xml" for writing
-			fwrite($fpPages, $xmlOutputPages); // save the contents of output buffer to the file
-			fclose($fpPages); // close the file
-		}
-		//Categories sitemap
-
-		$categoryArgs = $args = array(
-			'type' => 'post',
-			'child_of' => 0,
-			'parent' => '',
-			'orderby' => 'name',
-			'order' => 'ASC',
-			'hide_empty' => 1,
-			'hierarchical' => 1,
-			'exclude' => '',
-			'include' => '',
-			'number' => '',
-			'taxonomy' => 'category',
-			'pad_counts' => false);
-
-		$categoriesArray = get_categories($categoryArgs);
-
-		$xmlOutputCat = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
-
-		foreach ($categoriesArray as $category) {
-			$xmlOutputCat.= "\t<url>\n";
-			$xmlOutputCat.= "\t\t<loc>";
-			$xmlOutputCat.= get_category_link($category->cat_ID);
-			$xmlOutputCat.= "</loc>\n";
-
-			$xmlOutputCat.= "\t\t<priority>";
-			$xmlOutputCat.= "0.9";
-			$xmlOutputCat.= "</priority>\n";
-			$xmlOutputCat.= "\t\t<changefreq>";
-			$xmlOutputCat.= "yearly";
-			$xmlOutputCat.= "</changefreq>\n";
-			$xmlOutputCat.= "\t</url>\n";
-		}
-
-		$xmlOutputCat.= "</urlset>\n";
-		$xmlFileCat = ABSPATH . "/" . $smallName . "-skyword-categories-sitemap.xml";
-		if (file_exists(ABSPATH)) {
-			$fpCat = fopen($xmlFileCat, "w+"); // open the cache file "skyword-categories-sitemap.xml" for writing
-			fwrite($fpCat, $xmlOutputCat); // save the contents of output buffer to the file
-			fclose($fpCat); // close the file
-		}
-		//Tags sitemap
-
-		$tagsArray = get_tags();
-		$xmlOutputTags = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
-
-		foreach ($tagsArray as $tag) {
-			$xmlOutputTags.= "\t<url>\n";
-			$xmlOutputTags.= "\t\t<loc>";
-			$xmlOutputTags.= get_tag_link($tag->term_id);
-			$xmlOutputTags.= "</loc>\n";
-
-			$xmlOutputTags.= "\t\t<priority>";
-			$xmlOutputTags.= "0.9";
-			$xmlOutputTags.= "</priority>\n";
-			$xmlOutputTags.= "\t\t<changefreq>";
-			$xmlOutputTags.= "yearly";
-			$xmlOutputTags.= "</changefreq>\n";
-			$xmlOutputTags.= "\t</url>\n";
-		}
-
-		$xmlOutputTags.= "</urlset>\n";
-		$xmlFileTags = ABSPATH . "/" . $smallName . "-skyword-tags-sitemap.xml";
-		if (file_exists(ABSPATH)) {
-			$fpTags = fopen($xmlFileTags, "w+"); // open the cache file "skyword-tags-sitemap.xml" for writing
-			fwrite($fpTags, $xmlOutputTags); // save the contents of output buffer to the file
-			fclose($fpTags); // close the file
+		if ($options['skyword_generate_tags_sitemaps']) {
+			//Tags sitemap
+	
+			$tagsArray = get_tags();
+			$xmlOutputTags = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
+	
+			foreach ($tagsArray as $tag) {
+				$xmlOutputTags.= "\t<url>\n";
+				$xmlOutputTags.= "\t\t<loc>";
+				$xmlOutputTags.= get_tag_link($tag->term_id);
+				$xmlOutputTags.= "</loc>\n";
+	
+				$xmlOutputTags.= "\t\t<priority>";
+				$xmlOutputTags.= "0.9";
+				$xmlOutputTags.= "</priority>\n";
+				$xmlOutputTags.= "\t\t<changefreq>";
+				$xmlOutputTags.= "yearly";
+				$xmlOutputTags.= "</changefreq>\n";
+				$xmlOutputTags.= "\t</url>\n";
+			}
+	
+			$xmlOutputTags.= "</urlset>\n";
+			$xmlFileTags = ABSPATH . "/" . $smallName . "-skyword-tags-sitemap.xml";
+			if (file_exists(ABSPATH)) {
+				$fpTags = fopen($xmlFileTags, "w+"); // open the cache file "skyword-tags-sitemap.xml" for writing
+				fwrite($fpTags, $xmlOutputTags); // save the contents of output buffer to the file
+				fclose($fpTags); // close the file
+			}
 		}
 	}
 
