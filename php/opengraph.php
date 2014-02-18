@@ -39,7 +39,7 @@ class SkywordOpengraph
 					echo "<meta property='og:description' content='" .esc_attr($description)."'/>\n";
 					echo "<meta property='og:url' content='" .get_permalink($current_post->ID)."'/>\n";
 					echo "<meta property='og:site_name' content='" .get_option('blogname'). "'/>\n";
-					echo "<meta property='og:type' content='article'/>";
+					echo "<meta property='og:type' content='article'/>\n";
 					if (isset($image)) {
 						echo "<meta property='og:image' content='".esc_attr($image)."'/>\n";
 					}
