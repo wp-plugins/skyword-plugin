@@ -17,9 +17,27 @@ function skyword_plugin_options()
 		.skyword-settings .form-table {background:#fff; padding:20px;margin-bottom:-5px;}
 		.skyword-settings h3{margin-left:20px;}
 		.skyword-settings h2{background:url(http://www.skyword.com/wp-content/themes/skyword/images/s.png) no-repeat; height:30px;min-width:300px;}
-		.skyword-settings h2 span{display:none;}  
+		.skyword-settings h2 span{display:none;}
+		.skyword-settings .subSitemap, .skyword-settings .subSitemap + p{margin-left:30px;}  
 		.form-table td p {font-size:12px; color: #999999;} 
 	</style>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script type="text/JavaScript">
+        (function ($) {
+        	  
+        	  $("html").delegate("#sitemaps_enable", "click", sitemapCheck); 
+        	  sitemapCheck();
+              function sitemapCheck(){
+            	  if($("#sitemaps_enable").is(":checked")){
+            	  	 $(".subSitemap").removeAttr("disabled");
+            	  } else {
+            		  $(".subSitemap").attr("disabled", "disabled");
+            	  }
+              }
+        }(jQuery));
+    </script>
+	
+	
 	<div class="wrap skyword-settings">
 		<div class="icon32" id="icon-options-general"><br></div>
 		<h2><span>Skyword</span></h2>
@@ -45,11 +63,11 @@ function skyword_register_settings()
 	add_settings_field('skyword_api_key', '', 'skyword_api_key_input', __FILE__, 'skyword_apikey_section');
 	add_settings_section('skyword_ogtags_section', 'Facebook OpenGraph', 'skyword_plugin_section_text', __FILE__);
 	add_settings_field('skyword_enable_ogtags', '', 'skyword_enable_ogtags_input', __FILE__, 'skyword_ogtags_section');
+	add_settings_section('skyword_titletag_section', 'SEO Page Title', 'skyword_plugin_section_text', __FILE__);
 	add_settings_section('skyword_metatags_section', 'Meta Description', 'skyword_plugin_section_text', __FILE__);
 	add_settings_field('skyword_enable_metatags', '', 'skyword_enable_metatags_input', __FILE__, 'skyword_metatags_section');
 	add_settings_section('skyword_googlenewstags_section', 'Google News Keywords', 'skyword_plugin_section_text', __FILE__);
 	add_settings_field('skyword_enable_googlenewstag', '', 'skyword_enable_googlenewstag_input', __FILE__, 'skyword_googlenewstags_section');
-	add_settings_section('skyword_titletag_section', 'SEO Page Title', 'skyword_plugin_section_text', __FILE__);
 	add_settings_field('skyword_enable_pagetitle', ' ', 'skyword_enable_pagetitle_input', __FILE__, 'skyword_titletag_section');
 	add_settings_section('skyword_sitemap_section', 'XML Sitemaps', 'skyword_plugin_section_text', __FILE__);
 	add_settings_field('skyword_enable_sitemaps', ' ', 'skyword_enable_sitemaps_input', __FILE__, 'skyword_sitemap_section');
@@ -72,7 +90,7 @@ function skyword_api_key_input()
 function skyword_enable_ogtags_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_enable_ogtags]" value="1" ' . checked(1, $options['skyword_enable_ogtags'], false) . '/> Include the Facebook OpenGraph tags on the post. <p>The OpenGraph tags are used to properly send information to Facebook when a page is recommended, liked, or shared by Facebook users.</p>';
+	echo '<input type="checkbox" id="ogmeta_tag" name="skyword_plugin_options[skyword_enable_ogtags]" value="1" ' . checked(1, $options['skyword_enable_ogtags'], false) . '/> Include the Facebook OpenGraph tags on the post. <p>The OpenGraph tags are used to properly send information to Facebook when a page is recommended, liked, or shared by Facebook users.</p>';
 }
 
 function skyword_enable_metatags_input()
@@ -84,50 +102,50 @@ function skyword_enable_metatags_input()
 function skyword_enable_googlenewstag_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_enable_googlenewstag]" value="1" ' . checked(1, $options['skyword_enable_googlenewstag'], false) . '/> Include the Google News Keyword tag on the article post. <p>The Google News Keyword tag provides additional information for Google to properly index the web page for news searches.</p>';
+	echo '<input type="checkbox" id="google_tag" name="skyword_plugin_options[skyword_enable_googlenewstag]" value="1" ' . checked(1, $options['skyword_enable_googlenewstag'], false) . '/> Include the Google News Keyword tag on the post. <p>The Google News Keyword tag provides additional information for Google to properly index the web page. Useful for sites accepted as news providers by the Google News Team.</p>';
 }
 
 function skyword_enable_pagetitle_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_enable_pagetitle]" value="1" ' . checked(1, $options['skyword_enable_pagetitle'], false) . '/> Include the search engine optimized page title.<p>The page title will use the search engine optimized title provided by Skyword.</p>';
+	echo '<input type="checkbox" id="page_title" name="skyword_plugin_options[skyword_enable_pagetitle]" value="1" ' . checked(1, $options['skyword_enable_pagetitle'], false) . '/> Include the search engine optimized page title.<p>The page title will use the search engine optimized title provided by Skyword.</p>';
 }
 
 function skyword_enable_sitemaps_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_enable_sitemaps]" value="1" ' . checked(1, $options['skyword_enable_sitemaps'], false) . '/> Enable XML Sitemaps.<p>The XML Sitemaps are used to tell search engines about the pages on your site and 
+	echo '<input type="checkbox" id="sitemaps_enable" name="skyword_plugin_options[skyword_enable_sitemaps]" value="1" ' . checked(1, $options['skyword_enable_sitemaps'], false) . '/> Enable XML Sitemaps.<p>The XML Sitemaps are used to tell search engines about the pages on your site and 
 allows the search engines to better index your content. Select the types of site maps 
 below.</p>';
 }
 function skyword_generate_all_sitemaps_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_generate_all_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_all_sitemaps'], false) . '/> Generate XML Sitemap for all content.<p>This site map includes all posts and pages. Requires the XML Sitemaps to be enabled.</p>';
+	echo '<input type="checkbox" id="sitemaps_all" class="subSitemap" name="skyword_plugin_options[skyword_generate_all_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_all_sitemaps'], false) . '/> Generate XML Sitemap for all content.<p>This site map includes all posts and pages. Requires the XML Sitemaps to be enabled.</p>';
 }
 function skyword_generate_news_sitemaps_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_generate_news_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_news_sitemaps'], false) . '/> Generate Google News Sitemap.<p>The Google News site maps allow the Google search engine to discover and index news articles. Requires the XML Sitemaps to be enabled.</p>';
+	echo '<input type="checkbox" id="sitemaps_news" class="subSitemap" name="skyword_plugin_options[skyword_generate_news_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_news_sitemaps'], false) . '/> Generate Google News Sitemap.<p>The Google News site maps allow the Google search engine to discover and index news articles. Requires the XML Sitemaps to be enabled.</p>';
 }
 
 function skyword_generate_pages_sitemaps_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_generate_pages_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_pages_sitemaps'], false) . '/> Generate Pages Sitemap.<p>This site map includes only the pages in your site. Requires the XML Sitemaps to be 
+	echo '<input type="checkbox" id="sitemaps_page" class="subSitemap" name="skyword_plugin_options[skyword_generate_pages_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_pages_sitemaps'], false) . '/> Generate Pages Sitemap.<p>This site map includes only the pages in your site. Requires the XML Sitemaps to be 
 enabled.</p>';
 }
 
 function skyword_generate_categories_sitemaps_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_generate_categories_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_categories_sitemaps'], false) . '/> Generate Categories Sitemap.<p>This site map generates the list of category pages. Requires the XML Sitemaps to be enabled.</p>';
+	echo '<input type="checkbox" id="sitemaps_cat" class="subSitemap" name="skyword_plugin_options[skyword_generate_categories_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_categories_sitemaps'], false) . '/> Generate Categories Sitemap.<p>This site map generates the list of category pages. Requires the XML Sitemaps to be enabled.</p>';
 }
 
 function skyword_generate_tags_sitemaps_input()
 {
 	$options = get_option('skyword_plugin_options');
-	echo '<input type="checkbox" id="meta_tag" name="skyword_plugin_options[skyword_generate_tags_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_tags_sitemaps'], false) . '/> Generate Tags Sitemap.<p>This site map generates the list of tags. Requires the XML Sitemaps to be enabled.</p>';
+	echo '<input type="checkbox" id="sitemaps_tags" class="subSitemap" name="skyword_plugin_options[skyword_generate_tags_sitemaps]" value="1" ' . checked(1, $options['skyword_generate_tags_sitemaps'], false) . '/> Generate Tags Sitemap.<p>This site map generates the list of tags. Requires the XML Sitemaps to be enabled.</p>';
 }
 
 

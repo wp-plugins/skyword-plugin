@@ -155,6 +155,7 @@ class SkywordPublish
 		$login = $this->skyword_login($args);
 		if ($login['status']=="success") {
 			do_action( 'xmlrpc_call', 'wp.deletePost' );
+			$post_id = $args[3];
 			$post = get_post( $post_id, ARRAY_A );
 			if ( empty( $post['ID'] ) )
 				return new IXR_Error( 404, __( 'Invalid post ID.' ) );
