@@ -2,8 +2,8 @@
 Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.3
-Tested up to: 3.5
-Stable tag: 2.0.5.4
+Tested up to: 3.8
+Stable tag: 2.0.5.5
 
 Allows integration with the skyword publishing platform.
 
@@ -19,9 +19,11 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 2.0.5.5 =
+* Updated tested up to
+
 = 2.0.5.4 =
 * Updated admin panel
-
 
 = 2.0.5.3 =
 * Admin panel
