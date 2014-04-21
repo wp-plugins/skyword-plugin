@@ -216,7 +216,7 @@ class SkywordPublish
 				$new_post = array(
 					'ID' => $data['post-id'],
 					'post_title' => $data['title'],
-					'post_content' => $data['description'],
+					'post_content' => addslashes($data['description']),
 					'post_status' => $state,
 					'post_date' =>  $post_date,
 					'post_excerpt' => $data['excerpt'],
@@ -229,7 +229,7 @@ class SkywordPublish
 				//create new post
 				$new_post = array(
 					'post_title' => $data['title'],
-					'post_content' => $data['description'],
+					'post_content' => addslashes($data['description']),
 					'post_status' => $state,
 					'post_date' =>  $post_date,
 					'post_excerpt' => $data['excerpt'],
