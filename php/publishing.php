@@ -515,8 +515,8 @@ class SkywordPublish
 		$custom_fields = explode(":", $data['custom_fields']);
 		foreach ($custom_fields as $custom_field) {
 			$fields = explode("-", $custom_field);
-			delete_post_meta($post_id, $fields[0]);
-			add_post_meta($post_id, $fields[0], str_replace("%3A", ":", str_replace("%2d", "-", $fields[1])), false);
+            delete_post_meta($post_id, str_replace("%2d", "-", $fields[0]));
+			add_post_meta($post_id, str_replace("%2d", "-", $fields[0]), str_replace("%3A", ":", str_replace("%2d", "-", $fields[1])), false);
 		}
 	}
 	private function update_custom_field($post_id, $key, $data)
