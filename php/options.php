@@ -23,7 +23,7 @@ function skyword_plugin_options()
 	</style>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script type="text/JavaScript">
-        (function ($) {
+        $(document).ready(function () {
         	  
         	  $("html").delegate("#sitemaps_enable", "click", sitemapCheck); 
         	  sitemapCheck();
@@ -34,7 +34,7 @@ function skyword_plugin_options()
             		  $(".subSitemap").attr("disabled", "disabled");
             	  }
               }
-        }(jQuery));
+        });
     </script>
 	
 	

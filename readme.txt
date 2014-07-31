@@ -3,7 +3,7 @@ Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.3
 Tested up to: 3.8
-Stable tag: 2.0.5.7
+Stable tag: 2.1
 
 Allows integration with the skyword publishing platform.
 
@@ -19,6 +19,9 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 2.1 =
+* Added Geo My WP Integration
+
 = 2.0.5.7 =
 * Updated hyphens in custom fields
 
