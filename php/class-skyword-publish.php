@@ -258,7 +258,7 @@ class Skyword_Publish
 			if (null != $data['post-id']) {
 				$new_post['ID'] = $data['post-id'];
 			}
-			if (null != $data['user-id'] && is_numeric( $data['user-id'] ) )  {
+			if (null != $data['user-id'] && is_numeric( trim( $data['user-id'] ) ) ) {
 				$new_post['post_author'] = $data['user-id'];
 			}
 
