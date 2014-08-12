@@ -14,9 +14,9 @@ License: GPL2
 if ( !defined('SKYWORD_PATH') )
 	define( 'SKYWORD_PATH', plugin_dir_path( __FILE__ ) );
 if ( !defined('SKYWORD_VERSION') )
-	define( 'SKYWORD_VERSION', "2.1" );
+	define( 'SKYWORD_VERSION', "2.1.1" );
 if ( !defined('SKYWORD_VN') )
-	define( 'SKYWORD_VN', "2.1" );
+	define( 'SKYWORD_VN', "2.11" );
 
 register_activation_hook(__FILE__, 'get_skyword_defaults');
 
