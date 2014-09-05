@@ -244,9 +244,7 @@ class Skyword_Publish
 				
 			}
 			$data['post-id'] = $this->check_content_exists( $data['skyword_content_id'] , $data['post-type'] );
-			$new_post = array(
-				'post_title' => $data['title'],
-				'post_content' => addslashes( $data['description'] ),
+		    $new_post = array(
 				'post_status' => $state,
 				'post_date' =>  $post_date,
 				'post_excerpt' => $data['excerpt'],
@@ -255,13 +253,22 @@ class Skyword_Publish
 				'post_category' => $post_category
 			);
 
+			if (null != $data['title']) {
+				$new_post['post_title'] = $data['title'];
+			}
+			if (null != $data['description']) {
+				$new_post['post_content'] = addslashes( $data['description'] );
+			}
+			if (null != $data['slug']) {
+				$new_post['post_name'] = $data['slug'];
+			}
 			if (null != $data['post-id']) {
 				$new_post['ID'] = $data['post-id'];
 			}
-			if (null != $data['user-id'] && is_numeric( trim( $data['user-id'] ) ) ) {
+			if (null != $data['user-id'] &&  is_numeric( trim( $data['user-id'] ) ) ) {
 				$new_post['post_author'] = $data['user-id'];
 			}
-
+			
 			$post_id = wp_insert_post($new_post);
 		
 			$utf8string =  html_entity_decode( $data['tags-input'] );
@@ -297,7 +304,6 @@ class Skyword_Publish
 					'city' => $data[ 'gmwlocation_wppl_city' ],
 					'state' => $data[ 'gmwlocation_wppl_state' ],
 					'zipcode' => $data[ 'gmwlocation_wppl_zipcode' ],
-					'phone' => $data[ 'gmwlocation_wppl_phone' ],
 					'lat' => $data[ 'gmwlocation_wppl_lat' ],
 					'long' => $data[ 'gmwlocation_wppl_long' ]
 				));
@@ -309,8 +315,6 @@ class Skyword_Publish
 				$this->update_custom_field($post_id, '_wppl_long', $data[ 'gmwlocation_wppl_long' ] );
 				$this->update_custom_field($post_id, '_wppl_phone', $data[ 'gmwlocation_wppl_phone' ] );
 				
-
-
 			}
 			//Create sitemap information
 			if ( 'news' == $data['publication-type'] ) {
@@ -501,15 +505,47 @@ class Skyword_Publish
 	}
 	/**
 	* Checks whether username exists. 
-	* Creates Author if not
+	* Creates Guest Author if not
+	* Depends on Co Author Plus Plugin
 	*/
 	private function check_username_exists( $user_name, $display_name, $first_name, $last_name, $email, $bio ) {
+	    global $coauthors_plus;
 		$user_id = username_exists( $user_name );
 		if (!$user_id) {
 			$olduser_name = str_replace( 'sw-', 'skywriter-', $user_name );
 			$user_id = username_exists($olduser_name);
 			if (!$user_id) {
-
+			  if ( null != $coauthors_plus) {
+			    $guest_author = array();
+			    $guest_author['ID'] = '';
+			    $guest_author['display_name'] = $data['display-name'];
+			    $guest_author['first_name'] = $data['first-name'];
+			    $guest_author['last_name'] = $data['last-name'];
+			    $guest_author['user_login'] = $data['user-name'];
+			    $guest_author['user_email'] = $data['email'];
+			    $guest_author['description'] = $data['bio'];
+			    $guest_author['jabber'] = '';
+			    $guest_author['yahooim'] = '';
+			    $guest_author['aim'] = '';
+			    $guest_author['website'] = $data['website'];
+			    $guest_author['linked_account'] = '';
+			    $guest_author['website'] = $data['website'];
+			    $guest_author['company'] = $data['company'];
+			    $guest_author['title'] = $data['title'];
+			    $guest_author['google'] = $data['google'];
+			    $guest_author['twitter'] = $data['twitter'];
+			  
+			    $retval = $coauthors_plus->guest_authors->create( $guest_author );
+			    if( is_wp_error( $retval ) ) {
+			      $author = $coauthors_plus->guest_authors->get_guest_author_by( 'user_login', $data['user-name'] );
+			      if (null != $author){
+			        $user_id = 'guest-'.$author->ID;
+			      }
+			    } else {
+			      $user_id = 'guest-'.$retval;
+			    }
+			  
+			  } else {
 				//Generate a random password
   				$random_password = wp_generate_password(20, false);
   				//Create the account
@@ -524,7 +560,7 @@ class Skyword_Publish
 					'user_pass' => $random_password,
 					'description' => $bio
 				)) ;
-				
+			  }	
 			}
 			
 		}
