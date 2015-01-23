@@ -221,9 +221,8 @@ class Skyword_Publish
 		$login = $this->login( $args );
 		if ( 'success' == $login['status'] ) {
 			$data = $args[3];
-			if ( null != $data['publication-date'] ) {
-				$dateCreated = $data['publication-date']->getIso();
-				$post_date = get_date_from_gmt( iso8601_to_datetime( $dateCreated ) );
+			if ( null != $data['post-id'] ) {
+				$post_date = get_post_time('Y-m-d H:i:s', false, $data['post-id']);
 			} else {
 				$post_date = current_time('mysql');
 			}
