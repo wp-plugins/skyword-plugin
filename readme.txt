@@ -19,6 +19,11 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 2.1.3 =
+* Added shortcode for tracking - [skyword_tracking id='12345'] or [skyword_tracking] (auto content_id retrieval)
+* Fixed line returns in open graph tags.
+* Fixed published date changing after a revision.
+
 = 2.1.2 =
 * Added configurable slugs
 
