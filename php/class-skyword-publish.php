@@ -287,8 +287,13 @@ class Skyword_Publish
 			$this->update_custom_field( $post_id, 'skyword_content_id', $data['skyword_content_id'] );
 			
 			//add custom taxonomy values
-			foreach ( $data["taxonomies"] as $taxonomy ) { 
-			    wp_set_post_terms( $post_id, $taxonomy['values'], $taxonomy['name'], true );
+			foreach ( $data["taxonomies"] as $taxonomy ) {
+
+				if($this->valuesIsNumeric($taxonomy['values'])){
+					wp_set_post_terms( $post_id, $this->convertArrayValuesToInt($taxonomy['values']), $taxonomy['name'], TRUE );
+				}else {
+					wp_set_post_terms( $post_id, $taxonomy['values'], $taxonomy['name'], TRUE );
+				}
 			}
 			
 			if (null !=  $data[ 'gmwlocation_wppl_street' ]){
@@ -613,6 +618,26 @@ class Skyword_Publish
 	private function update_custom_field( $post_id, $key, $data ) {
 		delete_post_meta($post_id, $key);
 		add_post_meta($post_id, $key, $data, false);
+	}
+
+	/**
+	 * Check if array values are numbers
+	 */
+
+	private function valuesIsNumeric($array){
+
+		return $array == array_filter($array,'is_numeric');
+
+	}
+
+	/**
+	 *
+	 * Convert string values to integer
+	 *
+	 */
+
+	private function convertArrayValuesToInt($array){
+		return array_map('intval',$array);
 	}
 }
 

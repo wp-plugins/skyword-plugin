@@ -3,7 +3,7 @@ Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.3
 Tested up to: 3.8
-Stable tag: 2.1.3
+Stable tag: 2.1.5
 
 Allows integration with the skyword publishing platform.
 
@@ -19,6 +19,12 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 2.1.5 =
+* Can now send taxonomies by their id
+
+= 2.1.4 =
+* Fixed version number
+
 = 2.1.3 =
 * Added shortcode for tracking - [skyword_tracking id='12345'] or [skyword_tracking] (auto content_id retrieval)
 * Fixed line returns in open graph tags.
