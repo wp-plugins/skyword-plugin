@@ -3,7 +3,7 @@ Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.3
 Tested up to: 3.8
-Stable tag: 2.1.5
+Stable tag: 2.1.6
 
 Allows integration with the skyword publishing platform.
 
@@ -19,6 +19,9 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+= 2.1.6 =
+* Bug fix
+
 = 2.1.5 =
 * Can now send taxonomies by their id
 
