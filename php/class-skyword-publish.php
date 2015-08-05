@@ -234,7 +234,7 @@ class Skyword_Publish
 
 			$categories = $data['categories'];
 			$post_category = array();
-			foreach ( $categories as $category ) {
+			foreach ( (array)$categories as $category ) {
 				$categoryId = (int) $category['id'];
 				if ( $categoryId != null && $categoryId != 0 ){
 					$post_category[] = $category['id'];
@@ -287,7 +287,7 @@ class Skyword_Publish
 			$this->update_custom_field( $post_id, 'skyword_content_id', $data['skyword_content_id'] );
 			
 			//add custom taxonomy values
-			foreach ( $data["taxonomies"] as $taxonomy ) {
+			foreach ( (array)$data["taxonomies"] as $taxonomy ) {
 
 				if($this->valuesIsNumeric($taxonomy['values'])){
 					wp_set_post_terms( $post_id, $this->convertArrayValuesToInt($taxonomy['values']), $taxonomy['name'], TRUE );
