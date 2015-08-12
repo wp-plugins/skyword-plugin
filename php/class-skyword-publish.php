@@ -59,7 +59,7 @@ class Skyword_Publish
 		$login = $this->login( $args );
 		if ( 'success' == $login['status'] ) {
 			$data = $args[3];
-			$user_id = $this->check_username_exists( $data['user-name'], $data['display-name'], $data['first-name'], $data['last-name'], $data['email'], $data['bio'] );
+			$user_id = $this->check_username_exists( $data );
 			return strval( $user_id );
 		} else {
 			return $login['message'];
@@ -512,11 +512,11 @@ class Skyword_Publish
 	* Creates Guest Author if not
 	* Depends on Co Author Plus Plugin
 	*/
-	private function check_username_exists( $user_name, $display_name, $first_name, $last_name, $email, $bio ) {
+	private function check_username_exists( $data ) {
 	    global $coauthors_plus;
-		$user_id = username_exists( $user_name );
+		$user_id = username_exists( $data['user-name'] );
 		if (!$user_id) {
-			$olduser_name = str_replace( 'sw-', 'skywriter-', $user_name );
+			$olduser_name = str_replace( 'sw-', 'skywriter-', $data['user-name'] );
 			$user_id = username_exists($olduser_name);
 			if (!$user_id) {
 			  if ( null != $coauthors_plus) {
@@ -554,15 +554,15 @@ class Skyword_Publish
   				$random_password = wp_generate_password(20, false);
   				//Create the account
   				$user_id = wp_insert_user( array (
-					'first_name' => $first_name,
-					'last_name' => $last_name,
-					'user_nicename' => $user_name,
-					'display_name' => $display_name,
-					'user_email' => $email,
+					'first_name' => $data['first-name'],
+					'last_name' => $data['last-name'],
+					'user_nicename' => $data['user-name'],
+					'display_name' => $data['display-name'],
+					'user_email' => $data['email'],
 					'role' => "author",
-					'user_login' => $user_name,
+					'user_login' => $data['user-name'],
 					'user_pass' => $random_password,
-					'description' => $bio
+					'description' => $data['bio']
 				)) ;
 			  }	
 			}

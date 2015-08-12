@@ -2,8 +2,8 @@
 Contributors: skyword
 Tags: skyword, api
 Requires at least: 3.3
-Tested up to: 3.8
-Stable tag: 2.1.6
+Tested up to: 4.2.3
+Stable tag: 2.1.7
 
 Allows integration with the skyword publishing platform.
 
@@ -19,6 +19,10 @@ Allows integration with the skyword publishing platform.
 == Screenshots ==
 
 == Changelog ==
+
+= 2.1.7 =
+* Fix use of Coauthors Plus to create user
+
 = 2.1.6 =
 * Bug fix
 
